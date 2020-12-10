@@ -19,6 +19,7 @@
 import numpy as np
 from ravens import utils
 from ravens.models.resnet import ResNet43_8s
+from ravens.models.efficientnet import EfficientNetB0
 import tensorflow as tf
 import tensorflow_addons as tfa
 
@@ -26,7 +27,7 @@ import tensorflow_addons as tfa
 class Transport:
   """Transport module."""
 
-  def __init__(self, in_shape, n_rotations, crop_size, preprocess):
+  def __init__(self, in_shape, n_rotations, crop_size, preprocess, model='resnet'):
     """Transport module for placing.
 
     Args:
@@ -57,9 +58,19 @@ class Transport:
       self.kernel_dim = 3
 
     # 2 fully convolutional ResNets with 57 layers and 16-stride
-    in0, out0 = ResNet43_8s(in_shape, self.output_dim, prefix='s0_')
-    in1, out1 = ResNet43_8s(in_shape, self.kernel_dim, prefix='s1_')
-    self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
+    if model == 'resnet':
+      in0, out0 = ResNet43_8s(in_shape, self.output_dim, prefix='s0_')
+      in1, out1 = ResNet43_8s(in_shape, self.kernel_dim, prefix='s1_')
+      self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
+    else:
+      out0 = EfficientNetB0(include_top=False)
+      out1 = EfficientNetB0(include_top=False)
+      print(out1.layers[0].name)
+      self.model = tf.keras.Model(inputs=[out0.layers[0], out1.layers[0]], outputs=[out0, out1])
+      # in0, out0 = EfficientNetB0(include_top=False)
+      # in1, out1 = EfficientNetB0(include_top=False)
+      # self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
+      # self.model.compile(run_eagerly=True)
     self.optim = tf.keras.optimizers.Adam(learning_rate=1e-4)
     self.metric = tf.keras.metrics.Mean(name='loss_transport')
 
