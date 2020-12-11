@@ -101,20 +101,44 @@ class Transport:
       print('in_shape: ' + str(in_shape))
       enet = EfficientNetB0(include_top=False, pooling=None, input_shape=in_shape, weights=None)
       in0 = enet.input
+      y = tf.keras.layers.UpSampling2D(
+          size=(4, 4), interpolation='bilinear', name='upsample_4')(
+              enet.output)
+      bn_axis = 3 if tf.keras.backend.image_data_format() == 'channels_last' else 1
+      name = 'out0'
+      x = layers.Conv2D(
+          1280,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name=name + 'out_conv')(y)
+      x = layers.BatchNormalization(axis=bn_axis, name=name + 'expand_bn')(x)
+      x = layers.Activation('swish', name=name + 'expand_activation')(x)
       out0 = layers.Conv2D(
           self.output_dim,
           1,
           padding='same',
           use_bias=False,
           kernel_initializer=CONV_KERNEL_INITIALIZER,
-          name='out_conv')(enet.output)
+          name='out_conv_1')(x)
+      name = 'out1'
+      x = layers.Conv2D(
+          1280,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name=name + 'out_conv')(y)
+      x = layers.BatchNormalization(axis=bn_axis, name=name + 'expand_bn')(x)
+      x = layers.Activation('swish', name=name + 'expand_activation')(x)
       out1 = layers.Conv2D(
           self.kernel_dim,
           1,
           padding='same',
           use_bias=False,
           kernel_initializer=CONV_KERNEL_INITIALIZER,
-          name='out_conv_1')(enet.output)
+          name='out_conv')(x)
       # print(out1.layers[0].name)
       # print(out1.layers[-1].name)
       # self.model = tf.keras.Model(inputs=[out0.layers[0], out1.layers[0]], outputs=[out0, out1])
@@ -159,7 +183,7 @@ class Transport:
     img_unprocessed = np.pad(in_img, self.padding, mode='constant')
     input_data = self.preprocess(img_unprocessed.copy())
     in_shape = (1,) + input_data.shape
-    print('in_shape: ' + str(in_shape))
+    # print('in_shape: ' + str(in_shape))
     input_data = input_data.reshape(in_shape)
     in_tensor = tf.convert_to_tensor(input_data, dtype=tf.float32)
 

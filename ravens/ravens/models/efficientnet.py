@@ -79,8 +79,8 @@ DEFAULT_BLOCKS_ARGS = [{
     'filters_out': 24,
     'expand_ratio': 6,
     'id_skip': True,
-    'strides': 1,
-    'dilation_rate': 2,
+    'strides': 2,
+    'dilation_rate': 1,
     'se_ratio': 0.25
 }, {
     'kernel_size': 5,
@@ -89,8 +89,8 @@ DEFAULT_BLOCKS_ARGS = [{
     'filters_out': 40,
     'expand_ratio': 6,
     'id_skip': True,
-    'strides': 1,
-    'dilation_rate': 2,
+    'strides': 2,
+    'dilation_rate': 1,
     'se_ratio': 0.25
 }, {
     'kernel_size': 3,
