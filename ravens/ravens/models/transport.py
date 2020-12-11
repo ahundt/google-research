@@ -69,27 +69,54 @@ class Transport:
       self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
     elif model_name == 'efficientnet':
       print('in_shape: ' + str(in_shape))
-      out0 = EfficientNetB0(include_top=False, pooling=None, input_shape=in_shape, weights=None)
-      in0 = out0.input
+      enet = EfficientNetB0(include_top=False, pooling=None, input_shape=in_shape, weights=None)
+      in0 = enet.input
+      y = tf.keras.layers.UpSampling2D(
+          size=(4, 4), interpolation='bilinear', name='upsample_4')(
+              enet.output)
+      enet1 = EfficientNetB0(include_top=False, pooling=None, input_shape=in_shape, weights=None)
+      for layer in enet1.layers:
+          # rename all layers in the second model so there are no duplicate layer names
+          layer._name = layer.name + str("_1")
+      in1 = enet1.input
+      z = tf.keras.layers.UpSampling2D(
+          size=(4, 4), interpolation='bilinear', name='upsample_4_1')(
+              enet1.output)
+      bn_axis = 3 if tf.keras.backend.image_data_format() == 'channels_last' else 1
+      name = 'out0'
+      x = layers.Conv2D(
+          1280,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name=name + 'out_conv')(y)
+      x = layers.BatchNormalization(axis=bn_axis, name=name + 'expand_bn')(x)
+      x = layers.Activation('swish', name=name + 'expand_activation')(x)
       out0 = layers.Conv2D(
           self.output_dim,
           1,
           padding='same',
           use_bias=False,
           kernel_initializer=CONV_KERNEL_INITIALIZER,
-          name='out_conv')(out0.output)
-      out1 = EfficientNetB0(include_top=False, pooling=None, input_shape=in_shape, weights=None)
-      for layer in out1.layers:
-          # rename all layers in the second model so there are no duplicate layer names
-          layer._name = layer.name + str("_1")
-      in1 = out1.input
+          name='out_conv_1')(x)
+      name = 'out1'
+      x = layers.Conv2D(
+          1280,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name=name + 'out_conv')(z)
+      x = layers.BatchNormalization(axis=bn_axis, name=name + 'expand_bn')(x)
+      x = layers.Activation('swish', name=name + 'expand_activation')(x)
       out1 = layers.Conv2D(
           self.kernel_dim,
           1,
           padding='same',
           use_bias=False,
           kernel_initializer=CONV_KERNEL_INITIALIZER,
-          name='out_conv_1')(out1.output)
+          name='out_conv')(x)
       # print(out1.layers[0].name)
       # print(out1.layers[-1].name)
       # self.model = tf.keras.Model(inputs=[out0.layers[0], out1.layers[0]], outputs=[out0, out1])
