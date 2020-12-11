@@ -20,6 +20,10 @@ import numpy as np
 from ravens import utils
 from ravens.models.resnet import ResNet43_8s
 from ravens.models.efficientnet import EfficientNetB0
+from ravens.models.efficientnet import EfficientNet
+from ravens.models.efficientnet import block
+from ravens.models.efficientnet import CONV_KERNEL_INITIALIZER
+from tensorflow.keras import layers
 import tensorflow as tf
 import tensorflow_addons as tfa
 
@@ -27,7 +31,7 @@ import tensorflow_addons as tfa
 class Transport:
   """Transport module."""
 
-  def __init__(self, in_shape, n_rotations, crop_size, preprocess, model='resnet'):
+  def __init__(self, in_shape, n_rotations, crop_size, preprocess, model_name='efficientnet_merged'):
     """Transport module for placing.
 
     Args:
@@ -40,6 +44,7 @@ class Transport:
     self.n_rotations = n_rotations
     self.crop_size = crop_size  # crop size must be N*16 (e.g. 96)
     self.preprocess = preprocess
+    self.model_name = model_name
 
     self.pad_size = int(self.crop_size / 2)
     self.padding = np.zeros((3, 2), dtype=int)
@@ -58,18 +63,65 @@ class Transport:
       self.kernel_dim = 3
 
     # 2 fully convolutional ResNets with 57 layers and 16-stride
-    if model == 'resnet':
+    if model_name == 'resnet':
       in0, out0 = ResNet43_8s(in_shape, self.output_dim, prefix='s0_')
       in1, out1 = ResNet43_8s(in_shape, self.kernel_dim, prefix='s1_')
       self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
-    else:
-      out0 = EfficientNetB0(include_top=False)
-      out1 = EfficientNetB0(include_top=False)
-      print(out1.layers[0].name)
-      self.model = tf.keras.Model(inputs=[out0.layers[0], out1.layers[0]], outputs=[out0, out1])
+    elif model_name == 'efficientnet':
+      print('in_shape: ' + str(in_shape))
+      out0 = EfficientNetB0(include_top=False, pooling=None, input_shape=in_shape, weights=None)
+      in0 = out0.input
+      out0 = layers.Conv2D(
+          self.output_dim,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name='out_conv')(out0.output)
+      out1 = EfficientNetB0(include_top=False, pooling=None, input_shape=in_shape, weights=None)
+      for layer in out1.layers:
+          # rename all layers in the second model so there are no duplicate layer names
+          layer._name = layer.name + str("_1")
+      in1 = out1.input
+      out1 = layers.Conv2D(
+          self.kernel_dim,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name='out_conv_1')(out1.output)
+      # print(out1.layers[0].name)
+      # print(out1.layers[-1].name)
+      # self.model = tf.keras.Model(inputs=[out0.layers[0], out1.layers[0]], outputs=[out0, out1])
+      # self.model = tf.keras.Model(inputs=[, out1.layers[0]], outputs=[out0.layers[-1], out1.layers[-1]])
       # in0, out0 = EfficientNetB0(include_top=False)
       # in1, out1 = EfficientNetB0(include_top=False)
-      # self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
+      self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
+    elif model_name == 'efficientnet_merged':
+      print('in_shape: ' + str(in_shape))
+      enet = EfficientNetB0(include_top=False, pooling=None, input_shape=in_shape, weights=None)
+      in0 = enet.input
+      out0 = layers.Conv2D(
+          self.output_dim,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name='out_conv')(enet.output)
+      out1 = layers.Conv2D(
+          self.kernel_dim,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name='out_conv_1')(enet.output)
+      # print(out1.layers[0].name)
+      # print(out1.layers[-1].name)
+      # self.model = tf.keras.Model(inputs=[out0.layers[0], out1.layers[0]], outputs=[out0, out1])
+      # self.model = tf.keras.Model(inputs=[, out1.layers[0]], outputs=[out0.layers[-1], out1.layers[-1]])
+      # in0, out0 = EfficientNetB0(include_top=False)
+      # in1, out1 = EfficientNetB0(include_top=False)
+      self.model = tf.keras.Model(inputs=[in0], outputs=[out0, out1])
       # self.model.compile(run_eagerly=True)
     self.optim = tf.keras.optimizers.Adam(learning_rate=1e-4)
     self.metric = tf.keras.metrics.Mean(name='loss_transport')
@@ -107,6 +159,7 @@ class Transport:
     img_unprocessed = np.pad(in_img, self.padding, mode='constant')
     input_data = self.preprocess(img_unprocessed.copy())
     in_shape = (1,) + input_data.shape
+    print('in_shape: ' + str(in_shape))
     input_data = input_data.reshape(in_shape)
     in_tensor = tf.convert_to_tensor(input_data, dtype=tf.float32)
 
@@ -123,7 +176,10 @@ class Transport:
     # logits, kernel_raw = self.model([in_tensor, crop])
 
     # Crop after network (for receptive field, and more elegant).
-    logits, crop = self.model([in_tensor, in_tensor])
+    if self.model_name == 'efficientnet_merged':
+      logits, crop = self.model([in_tensor])
+    else:
+      logits, crop = self.model([in_tensor, in_tensor])
     # crop = tf.identity(kernel_bef_crop)
     crop = tf.repeat(crop, repeats=self.n_rotations, axis=0)
     crop = tfa.image.transform(crop, rvecs, interpolation='NEAREST')

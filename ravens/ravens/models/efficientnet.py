@@ -29,7 +29,6 @@ import tensorflow as tf
 import copy
 import math
 
-import tensorflow as tf
 from tensorflow.keras import backend
 from tensorflow.keras.applications import imagenet_utils
 # from tensorflow.keras.engine import training
@@ -225,14 +224,14 @@ def _obtain_input_shape(input_shape,
     """
     if weights != 'imagenet' and input_shape and len(input_shape) == 3:
         if data_format == 'channels_first':
-            if input_shape[0] not in {1, 3}:
+            if input_shape[0] not in {1, 3, 6}:
                 warnings.warn(
                     'This model usually expects 1 or 3 input channels. '
                     'However, it was passed an input_shape with ' +
                     str(input_shape[0]) + ' input channels.')
             default_shape = (input_shape[0], default_size, default_size)
         else:
-            if input_shape[-1] not in {1, 3}:
+            if input_shape[-1] not in {1, 3, 6}:
                 warnings.warn(
                     'This model usually expects 1 or 3 input channels. '
                     'However, it was passed an input_shape with ' +
@@ -443,8 +442,8 @@ def EfficientNet(
 
   # Build stem
   x = img_input
-  x = layers.experimental.preprocessing.Rescaling(1. / 255.)(x)
-  x = layers.experimental.preprocessing.Normalization(axis=bn_axis)(x)
+#   x = layers.experimental.preprocessing.Rescaling(1. / 255.)(x)
+#   x = layers.experimental.preprocessing.Normalization(axis=bn_axis)(x)
 
   x = layers.ZeroPadding2D(
       padding=correct_pad(backend, x, 3),
