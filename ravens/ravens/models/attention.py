@@ -20,6 +20,7 @@ import numpy as np
 from ravens import utils
 from ravens.models.resnet import ResNet36_4s
 from ravens.models.resnet import ResNet43_8s
+from ravens.models.transformer import ViT
 import tensorflow as tf
 import tensorflow_addons as tfa
 
@@ -27,7 +28,7 @@ import tensorflow_addons as tfa
 class Attention:
   """Attention module."""
 
-  def __init__(self, in_shape, n_rotations, preprocess, lite=False):
+  def __init__(self, in_shape, n_rotations, preprocess, lite=False, model_name='resnet'):
     self.n_rotations = n_rotations
     self.preprocess = preprocess
 
@@ -41,14 +42,19 @@ class Attention:
     in_shape += np.sum(self.padding, axis=1)
     in_shape = tuple(in_shape)
 
-    # Initialize fully convolutional Residual Network with 43 layers and
-    # 8-stride (3 2x2 max pools and 3 2x bilinear upsampling)
-    if lite:
-      d_in, d_out = ResNet36_4s(in_shape, 1)
+    if model_name == 'resnet':
+      # Initialize fully convolutional Residual Network with 43 layers and
+      # 8-stride (3 2x2 max pools and 3 2x bilinear upsampling)
+      if lite:
+        d_in, d_out = ResNet36_4s(in_shape, 1)
+      else:
+        d_in, d_out = ResNet43_8s(in_shape, 1)
+      self.model = tf.keras.models.Model(inputs=[d_in], outputs=[d_out])
+    elif model_name == 'vit':
+      self.model = ViT(image_size=in_shape, num_classes=1)
     else:
-      d_in, d_out = ResNet43_8s(in_shape, 1)
+      raise NotImplementedError('model_name not implemented: ' + str(model_name))
 
-    self.model = tf.keras.models.Model(inputs=[d_in], outputs=[d_out])
     self.optim = tf.keras.optimizers.Adam(learning_rate=1e-4)
     self.metric = tf.keras.metrics.Mean(name='loss_attention')
 

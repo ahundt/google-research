@@ -32,7 +32,7 @@ import tensorflow as tf
 class TransporterAgent:
   """Agent that uses Transporter Networks."""
 
-  def __init__(self, name, task, n_rotations=36):
+  def __init__(self, name, task, n_rotations=36, model_name='resnet'):
     self.name = name
     self.task = task
     self.total_steps = 0
@@ -41,7 +41,8 @@ class TransporterAgent:
     self.pix_size = 0.003125
     self.in_shape = (320, 160, 6)
     self.cam_config = cameras.RealSenseD415.CONFIG
-    self.models_dir = os.path.join('checkpoints', self.name)
+    self.model_name = model_name
+    self.models_dir = os.path.join('checkpoints', self.name + '_' + self.model_name)
     self.bounds = np.array([[0.25, 0.75], [-0.5, 0.5], [0, 0.28]])
 
   def get_image(self, obs):
@@ -119,7 +120,7 @@ class TransporterAgent:
       sc = tf.summary.scalar
       sc('train_loss/attention', loss0, step)
       sc('train_loss/transport', loss1, step)
-    print(f'Train Iter: {step} Loss: {loss0:.4f} {loss1:.4f}')
+    print(f'Train Iter: {step} attention loss: {loss0:.4f} transport loss: {loss1:.4f}')
     self.total_steps = step
 
     # TODO(andyzeng) cleanup goal-conditioned model.
@@ -243,18 +244,20 @@ class TransporterAgent:
 
 class OriginalTransporterAgent(TransporterAgent):
 
-  def __init__(self, name, task, n_rotations=36):
+  def __init__(self, name, task, n_rotations=36, model_name='vit'):
     super().__init__(name, task, n_rotations)
 
     self.attention = Attention(
         in_shape=self.in_shape,
         n_rotations=1,
-        preprocess=utils.preprocess)
+        preprocess=utils.preprocess,
+        model_name=model_name)
     self.transport = Transport(
         in_shape=self.in_shape,
         n_rotations=self.n_rotations,
         crop_size=self.crop_size,
-        preprocess=utils.preprocess)
+        preprocess=utils.preprocess,
+        model_name=model_name)
 
 
 class NoTransportTransporterAgent(TransporterAgent):

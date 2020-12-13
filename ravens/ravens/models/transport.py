@@ -26,12 +26,13 @@ from ravens.models.efficientnet import CONV_KERNEL_INITIALIZER
 from tensorflow.keras import layers
 import tensorflow as tf
 import tensorflow_addons as tfa
+import transformer as transformer
 
 
 class Transport:
   """Transport module."""
 
-  def __init__(self, in_shape, n_rotations, crop_size, preprocess, model_name='efficientnet_merged'):
+  def __init__(self, in_shape, n_rotations, crop_size, preprocess, model_name='resnet'):
     """Transport module for placing.
 
     Args:
@@ -173,6 +174,11 @@ class Transport:
       # in0, out0 = EfficientNetB0(include_top=False)
       # in1, out1 = EfficientNetB0(include_top=False)
       self.model = tf.keras.Model(inputs=[in0], outputs=[out0, out1])
+    elif model_name == 'vit':
+      # TODO(ahundt) make a compilable model, deal with dimension ordering, bhwc vs bchw
+      self.model = ViT(image_size=in_shape, num_classes=1)
+    else:
+      raise NotImplementedError('model_name not implemented: ' + str(model_name))
       # self.model.compile(run_eagerly=True)
     self.optim = tf.keras.optimizers.Adam(learning_rate=1e-4)
     self.metric = tf.keras.metrics.Mean(name='loss_transport')
