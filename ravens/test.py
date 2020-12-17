@@ -66,6 +66,7 @@ def main():
 
   # Run testing for each training run.
   for train_run in range(args.n_runs):
+    # name = f'{args.task}-{args.agent}-{args.n_demos}-{train_run}-efficientnet'
     name = f'{args.task}-{args.agent}-{args.n_demos}-{train_run}'
 
     # Initialize agent.

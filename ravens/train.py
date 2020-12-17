@@ -60,7 +60,8 @@ def main():
 
   # Run training from scratch multiple times.
   for train_run in range(args.n_runs):
-    name = f'{args.task}-{args.agent}-{args.n_demos}-{train_run}-efficientnet'
+    name = f'{args.task}-{args.agent}-{args.n_demos}-{train_run}'
+    # name = f'{args.task}-{args.agent}-{args.n_demos}-{train_run}-efficientnet'
 
     # Set up tensorboard logger.
     curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
