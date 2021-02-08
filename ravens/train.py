@@ -60,7 +60,12 @@ def main():
 
   # Run training from scratch multiple times.
   for train_run in range(args.n_runs):
+
     name = f'{args.task}-{args.agent}-{args.n_demos}-{train_run}'
+    # name = f'{args.task}-{args.agent}-{args.n_demos}-{train_run}-efficientnet'
+    # todo make name string for the two(search and final single path model) tasks from @ single_path_nas paper
+    # name = f'{args.task}-{args.agent}-{args.n_demos}-{train_run}-nas-search'
+    # name = f'{args.task}-{args.agent}-{args.n_demos}-{train_run}-train-final'
 
     # Set up tensorboard logger.
     curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
