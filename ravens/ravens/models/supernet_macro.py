@@ -125,14 +125,14 @@ def single_path_search(depth_multiplier=None):
   # defaults
 
   blocks_args = [
-  # todo add extra parameter for dilation  s22 -> s11_d22
-      'r1_k3_s11_d22_e1_i32_o16_noskip', 
-      'r4_k5_s22_d22_e6_i16_o24',
-      'r4_k5_s22_d22_e6_i24_o40', 
-      'r4_k5_s22_d22_e6_i40_o80',
-      'r4_k5_s11_d22_e6_i80_o96', 
-      'r4_k5_s22_d22_e6_i96_o192',
-      'r1_k3_s11_d22_e6_i192_o320_noskip'
+  # todo add extra parameter for dilation  s22 -> s11_d22. refer https://arxiv.org/abs/1603.07285
+      'r1_k3_s11_d11_e1_i32_o16_noskip',  
+      'r4_k5_s11_d22_e6_i16_o24', 
+      'r4_k5_s11_d22_e6_i24_o40',   
+      'r4_k5_s11_d22_e6_i40_o80', 
+      'r4_k5_s11_d11_e6_i80_o96',   
+      'r4_k5_s11_d22_e6_i96_o192',  
+      'r1_k3_s11_d11_e6_i192_o320_noskip'
   ]
 
   global_params = singlepath_supernet.GlobalParams(
