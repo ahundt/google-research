@@ -25,6 +25,7 @@ from ravens.models.efficientnet import EfficientNet
 from ravens.models.efficientnet import block
 from ravens.models.efficientnet import CONV_KERNEL_INITIALIZER
 from ravens.models.supernet_macro import build_supernet
+from ravens import nas_utils
 
 from tensorflow.keras import layers
 import tensorflow as tf
@@ -72,11 +73,25 @@ class Transport:
       in0, out0 = ResNet43_8s(in_shape, self.output_dim, prefix='s0_')
       in1, out1 = ResNet43_8s(in_shape, self.kernel_dim, prefix='s1_')
       self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
+
     elif model_name == 'supernet':
       # TODO make the supernet class and call it
-      build_supernet()
+      print('in_shape: ' + str(in_shape))
 
-      
+      global_step = tf.train.get_global_step()
+      warmup_steps = 6255
+      dropout_rate = nas_utils.build_dropout_rate(global_step, warmup_steps)
+      logits, runtime_val, indicators = build_supernet(
+        in_shape,
+        model_name='single-path-search', # default option, add flags for other search space: ref @single-path-nas search_main.py
+        training=is_training,
+        # override_params=override_params, 
+        dropout_rate=dropout_rate)
+
+
+
+      self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
+
 
     elif model_name == 'efficientnet':
       print('in_shape: ' + str(in_shape))
