@@ -394,9 +394,9 @@ class SinglePathSuperNet(tf.keras.Model):
         epsilon=batch_norm_epsilon,
         fused=True)
 
-    # todo check for pixel wise
-    self._avg_pooling = tf.keras.layers.GlobalAveragePooling2D(
-        data_format=self._global_params.data_format)
+    # # todo check for pixel wise
+    # self._avg_pooling = tf.keras.layers.GlobalAveragePooling2D(
+    #     data_format=self._global_params.data_format)
     self._fc = tf.keras.layers.Dense(
         self._global_params.num_classes,
         kernel_initializer=dense_kernel_initializer)
@@ -446,15 +446,15 @@ class SinglePathSuperNet(tf.keras.Model):
           for k, v in six.iteritems(block.endpoints):
             self.endpoints['block_%s/%s' % (idx, k)] = v
             
-    # Calls final layers and returns logits.
-    with tf.variable_scope('mnas_head'):
-      # todo add "if" to skip 450-458for pixel wise. 
-      outputs = tf.nn.relu(
-          self._bn1(self._conv_head(outputs), training=training))
-      outputs = self._avg_pooling(outputs)
-      if self._dropout:
-        outputs = self._dropout(outputs, training=training)
-      outputs = self._fc(outputs)
-      self.endpoints['head'] = outputs
+    # # Calls final layers and returns logits.
+    # with tf.variable_scope('mnas_head'):
+    #   # todo add "if" to skip 450-458for pixel wise. 
+    #   outputs = tf.nn.relu(
+    #       self._bn1(self._conv_head(outputs), training=training))
+    #   outputs = self._avg_pooling(outputs)
+    #   if self._dropout:
+    #     outputs = self._dropout(outputs, training=training)
+    #   outputs = self._fc(outputs)
+    #   self.endpoints['head'] = outputs
 
     return outputs, total_runtime
