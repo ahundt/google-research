@@ -448,7 +448,7 @@ class SinglePathSuperNet(tf.keras.Model):
             
     # Calls final layers and returns logits.
     with tf.variable_scope('mnas_head'):
-      # todo add "if" for pixel wise. 
+      # todo add "if" to skip 450-458for pixel wise. 
       outputs = tf.nn.relu(
           self._bn1(self._conv_head(outputs), training=training))
       outputs = self._avg_pooling(outputs)

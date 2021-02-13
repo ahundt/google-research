@@ -38,6 +38,7 @@ def main():
   parser.add_argument('--interval', default=1000, type=int)
   parser.add_argument('--gpu', default=0, type=int)
   parser.add_argument('--gpu_limit', default=None, type=int)
+  # todo add args for nas search and train final
   args = parser.parse_args()
 
   # Configure which GPU to use.
@@ -70,7 +71,7 @@ def main():
     # Set up tensorboard logger.
     curr_time = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
     log_dir = os.path.join('logs', args.agent, args.task, curr_time, 'train')
-    writer = tf.summary.create_file_writer(log_dir)
+    writer = tf.summary.create_file_writer(log_dir) #Creates a summary file writer for the given log directory. 
 
     # Initialize agent.
     np.random.seed(train_run)

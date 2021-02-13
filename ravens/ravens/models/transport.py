@@ -24,7 +24,7 @@ from ravens.models.efficientnet import EfficientNetB0
 from ravens.models.efficientnet import EfficientNet
 from ravens.models.efficientnet import block
 from ravens.models.efficientnet import CONV_KERNEL_INITIALIZER
-import supernet_macro
+from ravens.models.supernet_macro import build_supernet
 
 from tensorflow.keras import layers
 import tensorflow as tf
@@ -61,6 +61,7 @@ class Transport:
     # Crop before network (default for Transporters in CoRL submission).
     # kernel_shape = (self.crop_size, self.crop_size, in_shape[2])
 
+    # The result is True if the string is the name of one of the object’s attributes
     if not hasattr(self, 'output_dim'):
       self.output_dim = 3
     if not hasattr(self, 'kernel_dim'):
