@@ -149,7 +149,7 @@ def single_path_search(depth_multiplier=None):
   return decoder.decode(blocks_args), global_params
 
 
-def build_supernet(images, model_name, training, override_params=None, dropout_rate=None):
+def build_supernet(images, model_name, training, prefix='' override_params=None, dropout_rate=None):
   """A helper function to creates the NAS Supernet and returns predicted logits.
 
   Args:
@@ -180,6 +180,9 @@ def build_supernet(images, model_name, training, override_params=None, dropout_r
 
   with tf.variable_scope(model_name):
     model = singlepath_supernet.SinglePathSuperNet(blocks_args, global_params, dropout_rate)
+    for layer in model.layers:
+          # rename all layers in the second model so there are no duplicate layer names
+          layer._name = layer.name + prefix
     logits, total_runtime = model(images, training=training)
     # call method enables to write classes where the instances behave like functions and can be called like a function
 

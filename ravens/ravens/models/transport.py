@@ -75,20 +75,27 @@ class Transport:
       self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
 
     elif model_name == 'supernet':
-      # TODO make the supernet class and call it
       print('in_shape: ' + str(in_shape))
-
       global_step = tf.train.get_global_step()
       warmup_steps = 6255
       dropout_rate = nas_utils.build_dropout_rate(global_step, warmup_steps)
-      logits, runtime_val, indicators = build_supernet(
-        in_shape,
+      is_training = True # TODO check if its true or false
+      in0 = tf.keras.layers.Input(shape=input_shape)
+      out0, runtime_val, indicators = build_supernet(
+        in0,
         model_name='single-path-search', # default option, add flags for other search space: ref @single-path-nas search_main.py
         training=is_training,
         # override_params=override_params, 
         dropout_rate=dropout_rate)
 
-
+      in1 = tf.keras.layers.Input(shape=input_shape)
+      out1, runtime_val, indicators = build_supernet(
+        in1,
+        model_name='single-path-search', # default option, add flags for other search space: ref @single-path-nas search_main.py
+        training=is_training,
+        # override_params=override_params, 
+        dropout_rate=dropout_rate,
+        prefix='_1') # for different layer names
 
       self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
 
