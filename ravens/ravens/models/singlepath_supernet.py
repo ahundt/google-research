@@ -36,7 +36,7 @@ GlobalParams.__new__.__defaults__ = (None,) * len(GlobalParams._fields)
 # TODO(hongkuny): Consider rewrite an argument class with encoding/decoding.
 BlockArgs = collections.namedtuple('BlockArgs', [
     'kernel_size', 'num_repeat', 'input_filters', 'output_filters',
-    'expand_ratio', 'id_skip', 'strides', 'se_ratio'
+    'expand_ratio', 'id_skip', 'strides', 'se_ratio', 'dilations'
 ])
 # defaults will be a public argument for namedtuple in Python 3.7
 # https://docs.python.org/3/library/collections.html#collections.namedtuple
@@ -314,7 +314,7 @@ class SinglePathSuperNet(tf.keras.Model):
 
     self._search_space = global_params.search_space
 
-    tf.logging.info('Runtime model parsed')
+    tf.compat.v1.logging.info('Runtime model parsed')
     assert self._search_space == 'mnasnet' # currently supported one
     lutmodel_filename = "./pixel1_runtime_model.json"
     with open(lutmodel_filename, 'r') as f:

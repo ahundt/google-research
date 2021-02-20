@@ -178,7 +178,7 @@ def build_supernet(images, model_name, training, prefix='', override_params=None
     # in global_params.
     global_params = global_params._replace(**override_params)
 
-  with tf.variable_scope(model_name):
+  with tf.compat.v1.variable_scope(model_name):
     model = singlepath_supernet.SinglePathSuperNet(blocks_args, global_params, dropout_rate)
     for layer in model.layers:
           # rename all layers in the second model so there are no duplicate layer names
