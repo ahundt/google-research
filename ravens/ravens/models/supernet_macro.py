@@ -14,7 +14,7 @@ from __future__ import print_function
 
 import re
 import tensorflow as tf
-import singlepath_supernet
+from ravens.models import singlepath_supernet
 
 
 class MBConvDecoder(object):
@@ -149,7 +149,7 @@ def single_path_search(depth_multiplier=None):
   return decoder.decode(blocks_args), global_params
 
 
-def build_supernet(images, model_name, training, prefix='' override_params=None, dropout_rate=None):
+def build_supernet(images, model_name, training, prefix='', override_params=None, dropout_rate=None):
   """A helper function to creates the NAS Supernet and returns predicted logits.
 
   Args:

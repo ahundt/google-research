@@ -24,7 +24,7 @@ from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 import json
 
-from superkernel import *  # definition of masked layer (DepthwiseConv2DMasked)
+from ravens.models.superkernel import *  # definition of masked layer (DepthwiseConv2DMasked)
 
 # collections.namedtuple: create tuple-like objects that have fields accessible by attribute lookup 
 GlobalParams = collections.namedtuple('GlobalParams', [

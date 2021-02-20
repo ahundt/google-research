@@ -30,7 +30,7 @@ from ravens import nas_utils
 from tensorflow.keras import layers
 import tensorflow as tf
 import tensorflow_addons as tfa
-import transformer as transformer
+from ravens.models import transformer as transformer
 
 
 class Transport:
