@@ -63,7 +63,7 @@ def conv_kernel_initializer(shape, dtype=None, partition_info=None):
   del partition_info
   kernel_height, kernel_width, _, out_filters = shape
   fan_out = int(kernel_height * kernel_width * out_filters)
-  return tf.random_normal(
+  return tf.random.normal(
       shape, mean=0.0, stddev=np.sqrt(2.0 / fan_out), dtype=dtype)
 
 
@@ -86,7 +86,7 @@ def dense_kernel_initializer(shape, dtype=None, partition_info=None):
   """
   del partition_info
   init_range = 1.0 / np.sqrt(shape[1])
-  return tf.random_uniform(shape, -init_range, init_range, dtype=dtype)
+  return tf.random.uniform(shape, -init_range, init_range, dtype=dtype)
 
 
 def round_filters(filters, global_params):
@@ -158,7 +158,7 @@ class MBConvBlock(object):
           kernel_initializer=conv_kernel_initializer,
           padding='same',
           use_bias=False)
-      self._bn0 = tf.layers.BatchNormalization(
+      self._bn0 = tf.compat.v1.layers.BatchNormalization(
           axis=self._channel_axis,
           momentum=self._batch_norm_momentum,
           epsilon=self._batch_norm_epsilon,
@@ -192,7 +192,7 @@ class MBConvBlock(object):
     else:
       raise NotImplementedError('DepthConv not defined for %s' % self._search_space)
 
-    self._bn1 = tf.layers.BatchNormalization(
+    self._bn1 = tf.compat.v1.layers.BatchNormalization(
         axis=self._channel_axis,
         momentum=self._batch_norm_momentum,
         epsilon=self._batch_norm_epsilon,
@@ -228,7 +228,7 @@ class MBConvBlock(object):
         kernel_initializer=conv_kernel_initializer,
         padding='same',
         use_bias=False)
-    self._bn2 = tf.layers.BatchNormalization(
+    self._bn2 = tf.compat.v1.layers.BatchNormalization(
         axis=self._channel_axis,
         momentum=self._batch_norm_momentum,
         epsilon=self._batch_norm_epsilon,
@@ -243,9 +243,9 @@ class MBConvBlock(object):
     Returns:
       A output tensor, which should have the same shape as input.
     """
-    se_tensor = tf.reduce_mean(input_tensor, self._spatial_dims, keepdims=True)
+    se_tensor = tf.reduce_mean(input_tensor=input_tensor, axis=self._spatial_dims, keepdims=True)
     se_tensor = self._se_expand(tf.nn.relu(self._se_reduce(se_tensor)))
-    tf.logging.info('Built Squeeze and Excitation with tensor shape: %s' %
+    tf.compat.v1.logging.info('Built Squeeze and Excitation with tensor shape: %s' %
                     (se_tensor.shape))
     # return tf.sigmoid(se_tensor) * input_tensor
     return tf.keras.activations.swish(se_tensor) * input_tensor
@@ -261,19 +261,19 @@ class MBConvBlock(object):
     Returns:
       A output tensor.
     """
-    tf.logging.info('Block input: %s shape: %s' % (inputs.name, inputs.shape))
+    tf.compat.v1.logging.info('Block input: %s shape: %s' % (inputs.name, inputs.shape))
     if self._block_args.expand_ratio != 1:
       x = tf.nn.relu(self._bn0(self._expand_conv(inputs), training=training))
     else:
       x = inputs
-    tf.logging.info('Expand: %s shape: %s' % (x.name, x.shape))
+    tf.compat.v1.logging.info('Expand: %s shape: %s' % (x.name, x.shape))
 
     x, runtime = self._depthwise_conv(x, runtime)
     x = tf.nn.relu(self._bn1(x, training=training))
-    tf.logging.info('DWConv: %s shape: %s' % (x.name, x.shape))
+    tf.compat.v1.logging.info('DWConv: %s shape: %s' % (x.name, x.shape))
 
     if self.has_se:
-      with tf.variable_scope('se'):
+      with tf.compat.v1.variable_scope('se'):
         x = self._call_se(x)
 
     self.endpoints = {'expansion_output': x}
@@ -284,7 +284,7 @@ class MBConvBlock(object):
           s == 1 for s in self._block_args.strides
       ) and self._block_args.input_filters == self._block_args.output_filters:
         x = tf.add(x, inputs)
-    tf.logging.info('Project: %s shape: %s' % (x.name, x.shape))
+    tf.compat.v1.logging.info('Project: %s shape: %s' % (x.name, x.shape))
     return x, runtime
 
 
@@ -372,7 +372,7 @@ class SinglePathSuperNet(tf.keras.Model):
         kernel_initializer=conv_kernel_initializer,
         padding='same',
         use_bias=False)
-    self._bn0 = tf.layers.BatchNormalization(
+    self._bn0 = tf.compat.v1.layers.BatchNormalization(
         axis=channel_axis,
         momentum=batch_norm_momentum,
         epsilon=batch_norm_epsilon,
@@ -388,7 +388,7 @@ class SinglePathSuperNet(tf.keras.Model):
         use_bias=False)
 
     # todo check for pixel wise ?
-    self._bn1 = tf.layers.BatchNormalization(
+    self._bn1 = tf.compat.v1.layers.BatchNormalization(
         axis=channel_axis,
         momentum=batch_norm_momentum,
         epsilon=batch_norm_epsilon,
@@ -425,14 +425,14 @@ class SinglePathSuperNet(tf.keras.Model):
     # todo change in runtime
 
     # Calls Stem layers
-    with tf.variable_scope('mnas_stem'):
+    with tf.compat.v1.variable_scope('mnas_stem'):
       outputs = tf.nn.relu(
           self._bn0(self._conv_stem(inputs), training=training))
-    tf.logging.info('Built stem layers with output shape: %s' % outputs.shape)
+    tf.compat.v1.logging.info('Built stem layers with output shape: %s' % outputs.shape)
     self.endpoints['stem'] = outputs
     # Calls blocks.
     for idx, block in enumerate(self._blocks):
-      with tf.variable_scope('mnas_blocks_%s' % idx):
+      with tf.compat.v1.variable_scope('mnas_blocks_%s' % idx):
         outputs, total_runtime = block.call(outputs, total_runtime, training=training)
         self.endpoints['block_%s' % idx] = outputs
         # the indicator decisions 

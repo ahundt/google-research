@@ -26,15 +26,15 @@ def Indicator(x):
   #           bfloat16, float16, float32, float64, uint8, int8, uint16, int16, 
   #           int32, int64, complex64, complex128
   #return tf.stop_gradient((x>=0) - tf.sigmoid(x)) + tf.sigmoid(x)
-  return tf.stop_gradient(tf.to_float(x>=0) - tf.sigmoid(x)) + tf.sigmoid(x)
+  return tf.stop_gradient(tf.cast(x>=0, dtype=tf.float32) - tf.sigmoid(x)) + tf.sigmoid(x)
   # tf.stop_gradient: When building ops to compute gradients, this op prevents the contribution 
   # of its inputs to be taken into account. If you insert this op in the graph
   # it inputs are masked from the gradient generator. They are not taken into account for computing gradients.
 
 
 def sample_gumbel(shape, eps=1e-20):
-  U = tf.random_uniform(shape, minval=0, maxval=1)
-  return -tf.log(-tf.log(U + eps) + eps)
+  U = tf.random.uniform(shape, minval=0, maxval=1)
+  return -tf.math.log(-tf.math.log(U + eps) + eps)
 
 
 class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
@@ -108,11 +108,11 @@ class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
       # create masks based on kernel_shape
       center_3x3 = np.zeros(kernel_shape)
       center_3x3[1:4,1:4,:,:] = 1.0 # center 3x3
-      self.mask3x3 = tf.convert_to_tensor(center_3x3, 
+      self.mask3x3 = tf.convert_to_tensor(value=center_3x3, 
                         dtype=self.t5x5.dtype)
 
       center_5x5 = np.ones(kernel_shape) - center_3x3 # 5x5 - center 3x3
-      self.mask5x5 = tf.convert_to_tensor(center_5x5, 
+      self.mask5x5 = tf.convert_to_tensor(value=center_5x5, 
                         dtype=self.t5x5.dtype)
 
       num_channels = int(kernel_shape[2])
@@ -121,22 +121,22 @@ class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
 
       mask_50c = np.zeros(kernel_shape)
       mask_50c[:,:,0:c50,:] = 1.0 # from 0% to 50% channels
-      self.mask50c = tf.convert_to_tensor(mask_50c, 
+      self.mask50c = tf.convert_to_tensor(value=mask_50c, 
                         dtype=self.t5x5.dtype)
 
       mask_100c = np.zeros(kernel_shape)
       mask_100c[:,:,c50:c100,:] = 1.0 # from 50% to 100% channels
-      self.mask100c = tf.convert_to_tensor(mask_100c, 
+      self.mask100c = tf.convert_to_tensor(value=mask_100c, 
                         dtype=self.t5x5.dtype)
 
       #--> make indicator results "accessible" as separate vars
       kernel_3x3 = self.depthwise_kernel * self.mask3x3
       kernel_5x5 = self.depthwise_kernel * self.mask5x5
-      self.norm5x5 = tf.norm(kernel_5x5)
+      self.norm5x5 = tf.norm(tensor=kernel_5x5)
 
       x5x5 = self.norm5x5 - self.t5x5
       if self.dropout_rate is not None: # zero-out with drop_prob_ 
-        self.d5x5 = tf.nn.dropout(Indicator(x5x5), self.dropout_rate)
+        self.d5x5 = tf.nn.dropout(Indicator(x5x5), 1 - (self.dropout_rate))
       else:
         self.d5x5 = Indicator(x5x5)
 
@@ -146,13 +146,13 @@ class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
 
       kernel_50c = depthwise_kernel_masked_outside * self.mask50c
       kernel_100c = depthwise_kernel_masked_outside * self.mask100c
-      self.norm50c = tf.norm(kernel_50c)
-      self.norm100c = tf.norm(kernel_100c)
+      self.norm50c = tf.norm(tensor=kernel_50c)
+      self.norm100c = tf.norm(tensor=kernel_100c)
 
 
       x100c = self.norm100c - self.t100c
       if self.dropout_rate is not None: # noise to add
-        self.d100c = tf.nn.dropout(Indicator(x100c), self.dropout_rate)
+        self.d100c = tf.nn.dropout(Indicator(x100c), 1 - (self.dropout_rate))
       else:
         self.d100c = Indicator(x100c) 
 
@@ -160,7 +160,7 @@ class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
       if self.strides[0] == 1 and len(self.runtimes) == 5:
         x50c = self.norm50c - self.t50c
         if self.dropout_rate is not None: # noise to add
-          self.d50c = tf.nn.dropout(Indicator(x50c), self.dropout_rate)
+          self.d50c = tf.nn.dropout(Indicator(x50c), 1 - (self.dropout_rate))
         else:
           self.d50c = Indicator(x50c) 
       else: # you cannot drop all layers!

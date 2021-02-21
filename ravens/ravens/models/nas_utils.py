@@ -28,7 +28,7 @@ def build_learning_rate(initial_lr,
   if lr_decay_type == 'exponential':
     assert steps_per_epoch is not None
     decay_steps = steps_per_epoch * decay_epochs
-    lr = tf.train.exponential_decay(
+    lr = tf.compat.v1.train.exponential_decay(
         initial_lr, global_step, decay_steps, decay_factor, staircase=True)
   elif lr_decay_type == 'cosine':
     assert total_steps is not None
@@ -40,31 +40,31 @@ def build_learning_rate(initial_lr,
     assert False, 'Unknown lr_decay_type : %s' % lr_decay_type
 
   if warmup_epochs:
-    tf.logging.info('Learning rate warmup_epochs: %d' % warmup_epochs)
+    tf.compat.v1.logging.info('Learning rate warmup_epochs: %d' % warmup_epochs)
     warmup_steps = int(warmup_epochs * steps_per_epoch)
     warmup_lr = (
         initial_lr * tf.cast(global_step, tf.float32) / tf.cast(
             warmup_steps, tf.float32))
-    lr = tf.cond(global_step < warmup_steps, lambda: warmup_lr, lambda: lr)
+    lr = tf.cond(pred=global_step < warmup_steps, true_fn=lambda: warmup_lr, false_fn=lambda: lr)
 
   return lr
 
 
 def build_dropout_rate(global_step, warmup_steps=2502):
-  tf.logging.info('Dropout rate warmup steps: %d' % warmup_steps)
+  tf.compat.v1.logging.info('Dropout rate warmup steps: %d' % warmup_steps)
   warmup_dropout_rate = tf.cast(0.6, tf.float32)
   final_dropout_rate = tf.cast(1e2, tf.float32)
-  dropout_rate = tf.cond(global_step < warmup_steps, lambda: warmup_dropout_rate, 
-               lambda:final_dropout_rate)
+  dropout_rate = tf.cond(pred=global_step < warmup_steps, true_fn=lambda: warmup_dropout_rate, 
+               false_fn=lambda:final_dropout_rate)
   return dropout_rate
 
 
 def build_runtime_lambda(global_step, warmup_steps=2502, final_lambda=1.0):
-  tf.logging.info('Runtime lambda starts after steps: %d' % warmup_steps)
+  tf.compat.v1.logging.info('Runtime lambda starts after steps: %d' % warmup_steps)
   warmup_lambda_ = tf.cast(0.0, tf.float32)
   final_lambda_ = tf.cast(final_lambda, tf.float32)
-  runtime_lambda = tf.cond(global_step < warmup_steps, lambda: warmup_lambda_, 
-               lambda:final_lambda_)
+  runtime_lambda = tf.cond(pred=global_step < warmup_steps, true_fn=lambda: warmup_lambda_, 
+               false_fn=lambda:final_lambda_)
   return runtime_lambda
 
 
@@ -75,17 +75,17 @@ def build_optimizer(learning_rate,
                     momentum=0.9):
   """Build optimizer."""
   if optimizer_name == 'sgd':
-    tf.logging.info('Using SGD optimizer')
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+    tf.compat.v1.logging.info('Using SGD optimizer')
+    optimizer = tf.compat.v1.train.GradientDescentOptimizer(learning_rate=learning_rate)
   elif optimizer_name == 'momentum':
-    tf.logging.info('Using Momentum optimizer')
-    optimizer = tf.train.MomentumOptimizer(
+    tf.compat.v1.logging.info('Using Momentum optimizer')
+    optimizer = tf.compat.v1.train.MomentumOptimizer(
         learning_rate=learning_rate, momentum=momentum)
   elif optimizer_name == 'rmsprop':
-    tf.logging.info('Using RMSProp optimizer')
-    optimizer = tf.train.RMSPropOptimizer(learning_rate, decay, momentum,
+    tf.compat.v1.logging.info('Using RMSProp optimizer')
+    optimizer = tf.compat.v1.train.RMSPropOptimizer(learning_rate, decay, momentum,
                                           epsilon)
   else:
-    tf.logging.fatal('Unknown optimizer:', optimizer_name)
+    tf.compat.v1.logging.fatal('Unknown optimizer:', optimizer_name)
 
   return optimizer
