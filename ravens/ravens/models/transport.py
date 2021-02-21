@@ -78,7 +78,8 @@ class Transport:
       print('in_shape: ' + str(in_shape))
       global_step = tf.train.get_global_step()
       warmup_steps = 6255
-      dropout_rate = nas_utils.build_dropout_rate(global_step, warmup_steps)
+      # dropout_rate = nas_utils.build_dropout_rate(global_step, warmup_steps)
+      dropout_rate = 0.2
       is_training = True # TODO check if its true or false
       in0 = tf.keras.layers.Input(shape=in_shape)
       out0, runtime_val, indicators = build_supernet(
