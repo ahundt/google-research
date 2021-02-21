@@ -76,9 +76,10 @@ class Transport:
 
     elif model_name == 'supernet':
       print('in_shape: ' + str(in_shape))
-      global_step = tf.train.get_global_step()
-      warmup_steps = 6255
+      # global_step = tf.train.get_global_step()
+      # warmup_steps = 6255
       # dropout_rate = nas_utils.build_dropout_rate(global_step, warmup_steps)
+      # todo fix dropout rate, for time being const. dropout being used
       dropout_rate = 0.2
       is_training = True # TODO check if its true or false
       in0 = tf.keras.layers.Input(shape=in_shape)
@@ -310,6 +311,7 @@ class Transport:
       label[q[0], q[1], itheta] = 1
 
       # Get loss.
+      print(label.shape, output.shape)
       label = label.reshape(1, np.prod(label.shape))
       label = tf.convert_to_tensor(label, dtype=tf.float32)
       output = tf.reshape(output, (1, np.prod(output.shape)))
