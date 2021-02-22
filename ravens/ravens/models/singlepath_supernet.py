@@ -261,16 +261,16 @@ class MBConvBlock(object):
     Returns:
       A output tensor.
     """
-    tf.compat.v1.logging.info('Block input: %s shape: %s' % (inputs.name, inputs.shape))
+    # tf.compat.v1.logging.info('Block input: %s shape: %s' % (inputs.name, inputs.shape))
     if self._block_args.expand_ratio != 1:
       x = tf.nn.relu(self._bn0(self._expand_conv(inputs), training=training))
     else:
       x = inputs
-    tf.compat.v1.logging.info('Expand: %s shape: %s' % (x.name, x.shape))
+    # tf.compat.v1.logging.info('Expand: %s shape: %s' % (x.name, x.shape))
 
     x, runtime = self._depthwise_conv(x, runtime)
     x = tf.nn.relu(self._bn1(x, training=training))
-    tf.compat.v1.logging.info('DWConv: %s shape: %s' % (x.name, x.shape))
+    # tf.compat.v1.logging.info('DWConv: %s shape: %s' % (x.name, x.shape))
 
     if self.has_se:
       with tf.compat.v1.variable_scope('se'):
@@ -284,7 +284,7 @@ class MBConvBlock(object):
           s == 1 for s in self._block_args.strides
       ) and self._block_args.input_filters == self._block_args.output_filters:
         x = tf.add(x, inputs)
-    tf.compat.v1.logging.info('Project: %s shape: %s' % (x.name, x.shape))
+    # tf.compat.v1.logging.info('Project: %s shape: %s' % (x.name, x.shape))
     return x, runtime
 
 
