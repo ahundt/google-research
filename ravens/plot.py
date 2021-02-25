@@ -21,8 +21,28 @@ import os
 
 import pickle
 import numpy as np
+import json
 
 from ravens import utils
+
+
+class NumpyEncoder(json.JSONEncoder):
+    """ json encoder for numpy types
+    source: https://stackoverflow.com/a/49677241/99379
+    """
+    def default(self, obj):
+        if isinstance(obj,
+            (np.int_, np.intc, np.intp, np.int8,
+             np.int16, np.int32, np.int64, np.uint8,
+             np.uint16, np.uint32, np.uint64)):
+            return int(obj)
+        elif isinstance(obj,
+           (np.float_, np.float16, np.float32,
+            np.float64)):
+            return float(obj)
+        elif isinstance(obj, (np.ndarray,)):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 
 def main():
@@ -41,6 +61,7 @@ def main():
   # Load and print results to console.
   path = os.path.join('.')
   curve = []
+  results = []
   for fname in sorted(os.listdir(path)):
     if name in fname and '.pkl' in fname:
       n_steps = int(fname[(fname.rfind('-') + 1):-4])
@@ -48,12 +69,18 @@ def main():
       rewards = []
       for reward, _ in data:
         rewards.append(reward)
-      rewards = np.array(rewards) * 100
+      print(rewards)
+      rewards = (np.array(rewards) == 1.0) * 100
       score = np.mean(rewards)
       std = np.std(rewards)
+      result = {'steps':n_steps, 'score': score, 'std':std}
+      results += [result]
       print(f'  {n_steps} steps:\t{score:.1f}%\t± {std:.1f}%')
       curve.append((n_steps, score, std))
 
+  with open(name+ '.json', 'w') as f:
+    json.dump(results, f, cls=NumpyEncoder, sort_keys=True)
+  
   # Plot results over training steps.
   title = f'{args.agent} on {args.task} w/ {args.n_demos} demos'
   ylabel = 'Testing Task Success (%)'
