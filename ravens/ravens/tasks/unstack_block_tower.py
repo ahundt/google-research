@@ -22,7 +22,7 @@ from ravens import utils
 from ravens.tasks.task import Task
 
 
-class StackBlockTower(Task):
+class UnstackBlockTower(Task):
   """Stacking task."""
 
   def __init__(self):
@@ -49,9 +49,10 @@ class StackBlockTower(Task):
     # Add blocks.
     objs = []
     # sym = np.pi / 2
-    block_size = (0.05, 0.05, 0.05)
+    goal_height = 4
+    block_size = (0.05, 0.05, 0.05) * (5./4.)
     block_urdf = 'assets/stacking/block.urdf'
-    for i in range(6):
+    for i in range(goal_height):
       block_pose = self.get_random_pose(env, block_size)
       block_id = env.add_object(block_urdf, block_pose)
       p.changeVisualShape(block_id, -1, rgbaColor=colors[i] + [1])
