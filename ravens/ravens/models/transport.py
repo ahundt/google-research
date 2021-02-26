@@ -19,6 +19,7 @@
 import numpy as np
 from ravens import utils
 from ravens.models.resnet import ResNet43_8s
+from ravens.models.transformer import ViT
 
 from ravens.models.efficientnet import EfficientNetB0
 from ravens.models.efficientnet import EfficientNet
