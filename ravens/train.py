@@ -32,6 +32,7 @@ def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('--task', default='insertion')
   parser.add_argument('--agent', default='transporter')
+  parser.add_argument('--model_name', default='resnet')
   parser.add_argument('--n_demos', default=100, type=int)
   parser.add_argument('--n_steps', default=40000, type=int)
   parser.add_argument('--n_runs', default=1, type=int)
@@ -76,7 +77,8 @@ def main():
     # Initialize agent.
     np.random.seed(train_run)
     tf.random.set_seed(train_run)
-    agent = agents.names[args.agent](name, args.task, model_name='supernet')
+    # agent = agents.names[args.agent](name, args.task, model_name='supernet')
+    agent = agents.names[args.agent](name, args.task, model_name=args.model_name)
 
     # Limit random sampling during training to a fixed dataset.
     max_demos = train_dataset.n_episodes
