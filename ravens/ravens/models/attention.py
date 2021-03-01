@@ -24,6 +24,9 @@ from ravens.models.transformer import ViT
 import tensorflow as tf
 import tensorflow_addons as tfa
 
+from ravens.models.supernet_macro import build_supernet
+from ravens.models import nas_utils
+from ravens.models.efficientnet import CONV_KERNEL_INITIALIZER
 
 class Attention:
   """Attention module."""
@@ -50,6 +53,37 @@ class Attention:
       else:
         d_in, d_out = ResNet43_8s(in_shape, 1)
       self.model = tf.keras.models.Model(inputs=[d_in], outputs=[d_out])
+
+    elif model_name=='supernet':
+      # global_step = tf.train.get_global_step()
+      # warmup_steps = 6255
+      # dropout_rate = nas_utils.build_dropout_rate(global_step, warmup_steps)
+      # todo fix dropout rate, for time being const. dropout being used
+      dropout_rate = 0.2
+      is_training = True # TODO check if its true or false
+      in0 = tf.keras.layers.Input(shape=in_shape)
+      out0, runtime_val, indicators = build_supernet(
+        in0,
+        model_name='single-path-search', # default option, add flags for other search space: ref @single-path-nas search_main.py
+        training=is_training,
+        # override_params=override_params, 
+        dropout_rate=dropout_rate)
+      # print("attention supernet shapes", in0.shape, out0.shape)
+      y0 = tf.keras.layers.UpSampling2D(
+          size=(2, 2), interpolation='bilinear', name='upsample_4')(
+              out0)
+      bn_axis = 3 if tf.keras.backend.image_data_format() == 'channels_last' else 1
+      name = 'z0'
+      z0 = tf.keras.layers.Conv2D(
+          1,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name=name + 'out_conv')(y0)
+      print("z0.shape",z0.shape)
+      self.model = tf.keras.models.Model(inputs=[in0], outputs=[z0])
+
     elif model_name == 'vit':
       self.model = ViT(image_size=in_shape, num_classes=1)
     else:
