@@ -19,7 +19,6 @@
 import numpy as np
 from ravens import utils
 from ravens.models.resnet import ResNet43_8s
-from ravens.models.transformer import ViT
 
 from ravens.models.efficientnet import EfficientNetB0
 from ravens.models.efficientnet import EfficientNet
@@ -73,6 +72,8 @@ class Transport:
     if model_name == 'resnet':
       in0, out0 = ResNet43_8s(in_shape, self.output_dim, prefix='s0_')
       in1, out1 = ResNet43_8s(in_shape, self.kernel_dim, prefix='s1_')
+
+      print("resnet out0.shape",out0.shape,"out1.shape", out1.shape)
       self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
 
     elif model_name == 'supernet':
@@ -90,6 +91,34 @@ class Transport:
         training=is_training,
         # override_params=override_params, 
         dropout_rate=dropout_rate)
+      print("xx-1",out0.shape)
+      y0 = tf.keras.layers.UpSampling2D(
+          size=(2, 2), interpolation='bilinear', name='upsample_4')(
+              out0)
+      print("xx0",y0.shape)
+      bn_axis = 3 if tf.keras.backend.image_data_format() == 'channels_last' else 1
+      name = 'x0'
+      x0 = layers.Conv2D(
+          1280,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name=name + 'out_conv')(y0)
+      print("xx1",x0.shape)
+      x0 = layers.BatchNormalization(axis=bn_axis, name=name + 'expand_bn')(x0)
+      print("xx2",x0.shape)
+      x0 = layers.Activation('swish', name=name + 'expand_activation')(x0)
+      print("xx3",x0.shape)
+      x0 = layers.Conv2D(
+          self.output_dim,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name=name+'out_conv_1')(x0)
+
+      print("x0.shape",x0.shape)
 
       in1 = tf.keras.layers.Input(shape=in_shape)
       out1, runtime_val, indicators = build_supernet(
@@ -100,7 +129,31 @@ class Transport:
         dropout_rate=dropout_rate,
         prefix='_1') # for different layer names
 
-      self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
+      y1 = tf.keras.layers.UpSampling2D(
+          size=(2, 2), interpolation='bilinear', name='upsample_4_1')(
+              out1)
+      bn_axis = 3 if tf.keras.backend.image_data_format() == 'channels_last' else 1
+      name = 'x1'
+      x1 = layers.Conv2D(
+          1280,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name=name + 'out_conv')(y1)
+      x1 = layers.BatchNormalization(axis=bn_axis, name=name + 'expand_bn')(x1)
+      x1 = layers.Activation('swish', name=name + 'expand_activation')(x1)
+      x1 = layers.Conv2D(
+          self.kernel_dim,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name=name+'out_conv_1')(x1)
+          
+      print("x1.shape",x1.shape)
+
+      self.model = tf.keras.Model(inputs=[in0, in1], outputs=[x0, x1])
 
 
     elif model_name == 'efficientnet':
@@ -268,10 +321,12 @@ class Transport:
     # logits, kernel_raw = self.model([in_tensor, crop])
 
     # Crop after network (for receptive field, and more elegant).
+    print("in_tensor.shape",in_tensor.shape)
     if self.model_name == 'efficientnet_merged':
       logits, crop = self.model([in_tensor])
     else:
       logits, crop = self.model([in_tensor, in_tensor])
+    print("logits.shape",logits.shape)
     # crop = tf.identity(kernel_bef_crop)
     crop = tf.repeat(crop, repeats=self.n_rotations, axis=0)
     crop = tfa.image.transform(crop, rvecs, interpolation='NEAREST')
@@ -301,6 +356,7 @@ class Transport:
 
     self.metric.reset_states()
     with tf.GradientTape() as tape:
+      print("in_img.shape",in_img.shape)
       output = self.forward(in_img, p, softmax=False)
 
       itheta = theta / (2 * np.pi / self.n_rotations)
@@ -312,7 +368,7 @@ class Transport:
       label[q[0], q[1], itheta] = 1
 
       # Get loss.
-      print(label.shape, output.shape)
+      print("label.shape",label.shape,"output.shape", output.shape)
       label = label.reshape(1, np.prod(label.shape))
       label = tf.convert_to_tensor(label, dtype=tf.float32)
       output = tf.reshape(output, (1, np.prod(output.shape)))
