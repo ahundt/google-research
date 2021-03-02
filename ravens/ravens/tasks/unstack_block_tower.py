@@ -52,18 +52,19 @@ class UnstackBlockTower(Task):
     goal_height = 4
     block_size = (0.05, 0.05, 0.05) * (5./4.)
     block_urdf = 'assets/stacking/block.urdf'
+    block_pose = base_pose
+    block_pose[2] = self.get_random_pose(env, block_size)[2]
     for i in range(goal_height):
-      block_pose = self.get_random_pose(env, block_size)
       block_id = env.add_object(block_urdf, block_pose)
       p.changeVisualShape(block_id, -1, rgbaColor=colors[i] + [1])
       objs.append((block_id, (np.pi / 2, None)))
+      block_pose[2] += (block_size[2] + 0.01)
 
     # Associate placement locations for goals.
     # place_pos = [(0, -0.05, 0.03), (0, 0, 0.03),
     #              (0, 0.05, 0.03), (0, -0.025, 0.08),
     #              (0, 0.025, 0.08), (0, 0, 0.13)]
-    goal_height = 4
-    place_pos = [(0, 0.0, 0.03 + (block_size[0] + 0.01) * i) for i in range(goal_height)]
+    place_pos = [(0, -0.05 + (block_size[0] + 0.01) * i, 0.03) for i in range(goal_height)]
     targs = [(utils.apply(base_pose, i), base_pose[1]) for i in place_pos]
 
     # Goal: blocks are stacked in a tower (green, blue, purple, yellow, orange, red).
