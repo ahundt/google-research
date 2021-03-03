@@ -62,25 +62,31 @@ def main():
   path = os.path.join('.')
   curve = []
   results = []
+  count = 0
+
   for fname in sorted(os.listdir(path)):
-    if name in fname and '.pkl' in fname:
+    if name in fname and '.pkl' in fname and 'action-counts' not in fname:
       n_steps = int(fname[(fname.rfind('-') + 1):-4])
       data = pickle.load(open(fname, 'rb'))
       rewards = []
       for reward, _ in data:
         rewards.append(reward)
-      print(rewards)
       rewards = (np.array(rewards) == 1.0) * 100
+      print('filename: ' + str(fname) + 'rewards after locking to 100%: ' + str(rewards))
       score = np.mean(rewards)
       std = np.std(rewards)
       result = {'steps':n_steps, 'score': score, 'std':std}
       results += [result]
       print(f'  {n_steps} steps:\t{score:.1f}%\t± {std:.1f}%')
+      action_counts_name = f'{name}-{n_steps}-action-counts.pkl'
+      if os.path.exists(action_counts_name):
+        actions = pickle.load(open(action_counts_name, 'rb'))
+        count += sum(actions)
       curve.append((n_steps, score, std))
 
   with open(name+ '.json', 'w') as f:
     json.dump(results, f, cls=NumpyEncoder, sort_keys=True)
-  
+  print('count: ' +  str(count))
   # Plot results over training steps.
   title = f'{args.agent} on {args.task} w/ {args.n_demos} demos'
   ylabel = 'Testing Task Success (%)'
