@@ -27,8 +27,8 @@ class UnstackBlockTower(Task):
 
   def __init__(self):
     super().__init__()
-    self.max_steps = 12
-    self.pos_eps = 0.015
+    self.max_steps = 6
+    self.pos_eps = 0.05
     self.rot_eps = np.deg2rad(180)
 
   def reset(self, env):
@@ -36,9 +36,12 @@ class UnstackBlockTower(Task):
 
     # Add base.
     space = 0.01
+    x, y, z = 0, 1, 2
+    pos, rot = 0,1
     base_size = (0.05, 0.15 + (space*3), 0.005)
     base_urdf = 'assets/stacking/stand.urdf'
-    base_pose = self.get_random_pose(env, base_size)
+    # the unstacking task actually uses up more space than the stand itself, so get pose with double x, y
+    base_pose = self.get_random_pose(env, (base_size[x] * 2., base_size[y] * 2., base_size[z]))
     env.add_object(base_urdf, base_pose, 'fixed')
     print('base_pose ' + ': ' + str(base_pose))
 
@@ -54,8 +57,6 @@ class UnstackBlockTower(Task):
     goal_height = 4
     block_size = (0.05, 0.05, 0.05)
     block_urdf = 'assets/stacking/block.urdf'
-    x, y, z = 0, 1, 2
-    pos, rot = 0,1
     # block_pose = base_pose
     block_pos = utils.apply(base_pose, (0, -block_size[y], 0.03))
     # block_pose[z] = self.get_random_pose(env, block_size)[z]
