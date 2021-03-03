@@ -82,24 +82,30 @@ def main():
 
     # Run testing and save total rewards with last transition info.
     results = []
+    action_counts = []
     for i in range(dataset.n_episodes):
       print(f'Test: {i + 1}/{dataset.n_episodes}')
       episode, seed = dataset.load(i)
       goal = episode[-1]
       total_reward = 0
       np.random.seed(seed)
+      action_count = 0
       obs, reward, _, info = env.reset(task)
       for _ in range(task.max_steps):
         act = agent.act(obs, info, goal)
         obs, reward, done, info = env.step(act)
         total_reward += reward
+        action_count += 1
         print(f'{done} {total_reward}')
         if done:
           break
       results.append((total_reward, info))
+      action_counts += [action_count]
 
       # Save results.
+      print('total actions taken: ' + str(sum(action_counts)))
       pickle.dump(results, open(f'{name}-{args.n_steps}.pkl', 'wb'))
+      pickle.dump(action_counts, open(f'{name}-{args.n_steps}-action-counts.pkl', 'wb'))
 
 if __name__ == '__main__':
   main()
