@@ -184,6 +184,7 @@ intertia scaling: 2.0
 translation epsilon: 1.0 cm (except unstacking, where it is 5.0 cm)
 rotation epsilon: 180 degrees
 
+NOTE: we multiply these action counts by 2, because ravens considers grasp + place a single action, which is 2 actions for "Good Robot!".
 
 stack:
 2021-03-02 18:01:26.966644: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
@@ -197,7 +198,7 @@ filename: stack-block-tower-transporter-2-0-5000.pkl rewards after locking to 10
   5000 steps:   15.0%   ± 35.7%
 
 total actions taken: 1095
-efficiency: 55% = 600/1095
+efficiency: 27% = 600/(1095*2)
 
 
 row:
@@ -211,8 +212,7 @@ filename: block-row-transporter-2-0-5000.pklrewards after locking to 100%: [  0 
    0   0 100   0   0   0   0   0   0   0]
   5000 steps:   2.0%    ± 14.0%
 total actions taken: 1186
-600/1186
-0.5059021922428331
+Efficiency: 25% = 600/(1186*2)
 
 
 vertical square:
@@ -229,18 +229,22 @@ count: 0
 Done. Plot image saved to: stack-block-vertical-square-transporter-2--plot.png
 
 total actions taken: 1053
-Efficiency: 57%, 600/1053 = 0.5698005698005698
+Efficiency: 28%, 600/(1053*2) = 0.2849002849002849
 
 
 
 unstack:
-2021-03-02 15:57:58.155055: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-02 21:07:28.997103: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
 unstack-block-tower-transporter-2-
-[1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0.6666666666666666, 0, 0, 0, 0, 0, 0.3333333333333333, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 1.0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0,
-0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.3333333333333333, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0]
-  5000 steps:   12.0%   ± 32.5%
-/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
-  plt.xlim(xlim)
-Done. Plot image saved to: unstack-block-tower-transporter-2--plot.png
+filename: unstack-block-tower-transporter-2-0-5000.pklrewards after locking to 100%: [100   0 100   0 100   0   0   0   0   0   0 100 100   0   0 100   0   0
+ 100   0   0   0   0 100   0   0 100   0   0   0   0   0 100 100 100   0
+   0   0   0 100 100 100   0   0   0   0 100 100 100 100   0   0 100 100
+ 100   0 100 100   0   0   0   0 100 100   0 100   0   0 100   0 100   0
+ 100 100 100   0   0   0   0 100 100 100   0   0   0   0   0 100   0   0
+   0   0   0 100   0   0   0 100   0   0]
+  5000 steps:   38.0%   ± 48.5%
 
+total actions taken: 489
+Efficiency: 61%, 600/(489*2) = 0.6134969325153374
 Manual count of unstacking trial success: 92/100 = 92%
