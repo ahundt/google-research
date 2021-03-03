@@ -28,7 +28,7 @@ class StackBlockVerticalSquare(Task):
   def __init__(self):
     super().__init__()
     self.max_steps = 12
-    self.pos_eps = 0.015
+    self.pos_eps = 0.01
     self.rot_eps = np.deg2rad(180)
 
   def reset(self, env):
