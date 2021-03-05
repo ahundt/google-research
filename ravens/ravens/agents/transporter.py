@@ -250,8 +250,8 @@ class OriginalTransporterAgent(TransporterAgent):
     self.attention = Attention(
         in_shape=self.in_shape,
         n_rotations=1,
-        preprocess=utils.preprocess)
-        # model_name=model_name)
+        preprocess=utils.preprocess,
+        model_name=model_name)
 
     self.transport = Transport(
         in_shape=self.in_shape,
