@@ -77,6 +77,8 @@ class Transport:
       self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
 
     elif model_name == 'supernet':
+      #  check if we need to train final model
+      
       print('in_shape: ' + str(in_shape))
       # global_step = tf.train.get_global_step()
       # warmup_steps = 6255

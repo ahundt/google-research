@@ -92,5 +92,7 @@ def main():
       agent.validate(test_dataset, writer)
       agent.save()
 
+    # train supernet/ train final (delete pre existiing model - destroy and create onjects)
+
 if __name__ == '__main__':
   main()
