@@ -84,6 +84,15 @@ class Attention:
       print("z0.shape",z0.shape)
       self.model = tf.keras.models.Model(inputs=[in0], outputs=[z0])
 
+    elif model_name == 'supernet_train_final':
+    	# todo remove resnet and add supernet_train_final
+    	print('### supernet_train_final not added to attention using resnet')
+    	if lite:
+    		d_in, d_out = ResNet36_4s(in_shape, 1)
+    	else:
+    		d_in, d_out = ResNet43_8s(in_shape, 1)
+    	self.model = tf.keras.models.Model(inputs=[d_in], outputs=[d_out])
+
     elif model_name == 'vit':
       self.model = ViT(image_size=in_shape, num_classes=1)
     else:
