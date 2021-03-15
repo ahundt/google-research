@@ -31,7 +31,7 @@ from tensorflow.keras import layers
 import tensorflow as tf
 import tensorflow_addons as tfa
 from ravens.models import transformer as transformer
-
+from nas_train_final.models import build_model as nas_final_model #to build searched architecture using indicators
 
 class Transport:
   """Transport module."""
@@ -127,6 +127,39 @@ class Transport:
 
       self.model = tf.keras.Model(inputs=[in0], outputs=[x0])
 
+    elif model_name == 'supernet_train_final':
+      print("Training final NAS architecture")
+      
+      in0=tf.keras.layers.Input(shape=in_shape)
+      out0, _ = nas_final_model(
+        in0,
+        model_name='single-path',
+        training=True,
+        # override_params=override_params,
+        parse_search_dir='nas_model')
+      # print("supernet_train_final in0 shape", out0.shape)
+
+      out0 = tf.reshape(out0, [-1,224,160,3])
+      # print(out0.shape)
+      out0 = tf.keras.layers.UpSampling2D(
+        size=(2, 2), interpolation='bilinear', name='upsample_4_1')(out0)
+      # print(out0.shape)
+      out0=out0[:,:384,:224]
+      # print(out0.shape)
+
+      in1=tf.keras.layers.Input(shape=in_shape)
+      out1, _ = nas_final_model(
+        in1,
+        model_name='single-path',
+        training=True,
+        # override_params=override_params,
+        parse_search_dir='nas_model')
+
+      out1 = tf.reshape(out1, [-1,224,160,3])
+      out1 = tf.keras.layers.UpSampling2D(
+        size=(2, 2), interpolation='bilinear', name='upsample_4_2')(out1)
+      out1=out1[:,:384,:224]
+      self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
 
     elif model_name == 'efficientnet':
       print('in_shape: ' + str(in_shape))
