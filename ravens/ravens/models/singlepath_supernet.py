@@ -23,6 +23,7 @@ import six # Python 2 and 3 compatibility library
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 import json
+import pickle
 
 from ravens.models.superkernel import *  # definition of masked layer (DepthwiseConv2DMasked)
 
@@ -456,5 +457,10 @@ class SinglePathSuperNet(tf.keras.Model):
     #     outputs = self._dropout(outputs, training=training)
     #   outputs = self._fc(outputs)
     #   self.endpoints['head'] = outputs
+
+    # print("supernet @@@@",self.indicators)
+    #  save the indicators to a file
+    with open("indicators.pkl", 'wb+') as file:
+      pickle.dump(self.indicators, file)
 
     return outputs, total_runtime

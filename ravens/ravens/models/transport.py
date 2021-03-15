@@ -70,6 +70,7 @@ class Transport:
 
     # 2 fully convolutional ResNets with 57 layers and 16-stride
     if model_name == 'resnet':
+      print('in_shape: ' + str(in_shape))
       in0, out0 = ResNet43_8s(in_shape, self.output_dim, prefix='s0_')
       in1, out1 = ResNet43_8s(in_shape, self.kernel_dim, prefix='s1_')
 
@@ -113,49 +114,18 @@ class Transport:
       x0 = layers.Activation('swish', name=name + 'expand_activation')(x0)
       print("xx3",x0.shape)
       x0 = layers.Conv2D(
-          self.output_dim,
+          # self.output_dim,
+          36,
           1,
           padding='same',
           use_bias=False,
           kernel_initializer=CONV_KERNEL_INITIALIZER,
           name=name+'out_conv_1')(x0)
-
+      # todo replace this tensor crop with suitable convolution/pooling
+      x0=x0[:,:320,:160]
       print("x0.shape",x0.shape)
 
-      in1 = tf.keras.layers.Input(shape=in_shape)
-      out1, runtime_val, indicators = build_supernet(
-        in1,
-        model_name='single-path-search', # default option, add flags for other search space: ref @single-path-nas search_main.py
-        training=is_training,
-        # override_params=override_params, 
-        dropout_rate=dropout_rate,
-        prefix='_1') # for different layer names
-
-      y1 = tf.keras.layers.UpSampling2D(
-          size=(2, 2), interpolation='bilinear', name='upsample_4_1')(
-              out1)
-      bn_axis = 3 if tf.keras.backend.image_data_format() == 'channels_last' else 1
-      name = 'x1'
-      x1 = layers.Conv2D(
-          1280,
-          1,
-          padding='same',
-          use_bias=False,
-          kernel_initializer=CONV_KERNEL_INITIALIZER,
-          name=name + 'out_conv')(y1)
-      x1 = layers.BatchNormalization(axis=bn_axis, name=name + 'expand_bn')(x1)
-      x1 = layers.Activation('swish', name=name + 'expand_activation')(x1)
-      x1 = layers.Conv2D(
-          self.kernel_dim,
-          1,
-          padding='same',
-          use_bias=False,
-          kernel_initializer=CONV_KERNEL_INITIALIZER,
-          name=name+'out_conv_1')(x1)
-          
-      print("x1.shape",x1.shape)
-
-      self.model = tf.keras.Model(inputs=[in0, in1], outputs=[x0, x1])
+      self.model = tf.keras.Model(inputs=[in0], outputs=[x0])
 
 
     elif model_name == 'efficientnet':
@@ -326,9 +296,12 @@ class Transport:
     print("in_tensor.shape",in_tensor.shape)
     if self.model_name == 'efficientnet_merged':
       logits, crop = self.model([in_tensor])
+    elif self.model_name == 'supernet':
+      logits = self.model([in_tensor])
+      return logits
     else:
       logits, crop = self.model([in_tensor, in_tensor])
-    print("logits.shape",logits.shape)
+    print("forward:logits.shape",logits.shape)
     # crop = tf.identity(kernel_bef_crop)
     crop = tf.repeat(crop, repeats=self.n_rotations, axis=0)
     crop = tfa.image.transform(crop, rvecs, interpolation='NEAREST')

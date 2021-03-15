@@ -32,7 +32,7 @@ def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('--task', default='insertion')
   parser.add_argument('--agent', default='transporter')
-  parser.add_argument('--model_name', default='resnet')
+  parser.add_argument('--model_name', default='resnet', help='resnet, supernet, supernet_train_final ...')
   parser.add_argument('--n_demos', default=100, type=int)
   parser.add_argument('--n_steps', default=40000, type=int)
   parser.add_argument('--n_runs', default=1, type=int)
