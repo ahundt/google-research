@@ -27,6 +27,7 @@ import tensorflow_addons as tfa
 from ravens.models.supernet_macro import build_supernet
 from ravens.models import nas_utils
 from ravens.models.efficientnet import CONV_KERNEL_INITIALIZER
+from nas_train_final.models import build_model as nas_final_model #to build searched architecture using indicators
 
 class Attention:
   """Attention module."""
