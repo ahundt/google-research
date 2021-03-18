@@ -121,8 +121,7 @@ class Transport:
           use_bias=False,
           kernel_initializer=CONV_KERNEL_INITIALIZER,
           name=name+'out_conv_1')(x0)
-      # todo replace this tensor crop with suitable convolution/pooling
-      x0=x0[:,:320,:160]
+      x0 = tf.keras.layers.Cropping2D(cropping=(32,32))(x0)
       print("x0.shape",x0.shape)
 
       self.model = tf.keras.Model(inputs=[in0], outputs=[x0])
@@ -137,15 +136,16 @@ class Transport:
         training=True,
         # override_params=override_params,
         parse_search_dir='nas_model')
-      # print("supernet_train_final in0 shape", out0.shape)
-
-      out0 = tf.reshape(out0, [-1,224,160,3])
-      # print(out0.shape)
+      out0 = tf.keras.layers.Reshape((192,112,5), name='reshape_1')(out0)
+      out0 = layers.Conv2D(
+          3,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name='out_conv1')(out0)
       out0 = tf.keras.layers.UpSampling2D(
         size=(2, 2), interpolation='bilinear', name='upsample_4_1')(out0)
-      # print(out0.shape)
-      out0=out0[:,:384,:224]
-      # print(out0.shape)
 
       in1=tf.keras.layers.Input(shape=in_shape)
       out1, _ = nas_final_model(
@@ -154,11 +154,17 @@ class Transport:
         training=True,
         # override_params=override_params,
         parse_search_dir='nas_model')
-
-      out1 = tf.reshape(out1, [-1,224,160,3])
+      out1 = tf.keras.layers.Reshape((192,112,5), name='reshape_2')(out1)
+      out1 = layers.Conv2D(
+          3,
+          1,
+          padding='same',
+          use_bias=False,
+          kernel_initializer=CONV_KERNEL_INITIALIZER,
+          name='out_conv2')(out1)
       out1 = tf.keras.layers.UpSampling2D(
         size=(2, 2), interpolation='bilinear', name='upsample_4_2')(out1)
-      out1=out1[:,:384,:224]
+
       self.model = tf.keras.Model(inputs=[in0, in1], outputs=[out0, out1])
 
     elif model_name == 'efficientnet':
