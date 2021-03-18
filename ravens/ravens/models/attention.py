@@ -85,13 +85,25 @@ class Attention:
       self.model = tf.keras.models.Model(inputs=[in0], outputs=[z0])
 
     elif model_name == 'supernet_train_final':
-    	# todo remove resnet and add supernet_train_final
-    	print('### supernet_train_final not added to attention using resnet')
-    	if lite:
-    		d_in, d_out = ResNet36_4s(in_shape, 1)
-    	else:
-    		d_in, d_out = ResNet43_8s(in_shape, 1)
-    	self.model = tf.keras.models.Model(inputs=[d_in], outputs=[d_out])
+    	print("Training final NAS architecture (attention) --------- ")
+		in0=tf.keras.layers.Input(shape=in_shape)
+		out0, _ = nas_final_model(
+			in0,
+			model_name='single-path',
+			training=True,
+			# override_params=override_params,
+			parse_search_dir='nas_model')
+		out0 = tf.keras.layers.Reshape((160,160,5), name='predictions')(out0)
+		out0 = tf.keras.layers.Conv2D(
+			1,
+			1,
+			padding='same',
+			use_bias=False,
+			kernel_initializer=CONV_KERNEL_INITIALIZER,
+			name='out_conv1')(out0)
+		out0 = tf.keras.layers.UpSampling2D(
+		size=(2, 2), interpolation='bilinear', name='upsample_attn_1')(out0)
+		print("attention out0.shape",out0.shape)
 
     elif model_name == 'vit':
       self.model = ViT(image_size=in_shape, num_classes=1)
