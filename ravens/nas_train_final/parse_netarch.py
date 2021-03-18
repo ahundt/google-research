@@ -29,22 +29,16 @@ def parse_indicators_single_path_nas(path, tf_size_guidance):
       v = indicators[key_][decision_label]
       t_list.append(tf.reshape(v, [1]))
 
-  # print(len(t_list))
-  # print(t_list)
-  # print(float((t_list[0])))
-
-  # todo temp code to correct t_list and check working
   t_list_float = [float(i) for i in t_list]
-  for i,ele in enumerate(t_list_float):
-    if i%2==0:
-      t_list_float[i]=0.0
-    else:
-      t_list_float[i]=1.0
 
-  # print(t_list_float)
-  tt  = np.reshape(t_list_float, (20, 3)).tolist()
-  # print(tt)
-  return(tt)
+  # # todo temp code to correct t_list and check working
+  # for i,ele in enumerate(t_list_float):
+  #   if i%2==0:
+  #     t_list_float[i]=0.0
+  #   else:
+  #     t_list_float[i]=1.0
+
+  return(np.reshape(t_list_float, (20, 3)).tolist())
 
 
 def encode_single_path_nas_arch(inds, hard=False):
