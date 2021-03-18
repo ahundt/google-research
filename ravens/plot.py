@@ -72,7 +72,7 @@ def main():
       for reward, _ in data:
         rewards.append(reward)
       rewards = (np.array(rewards) == 1.0) * 100
-      print('filename: ' + str(fname) + 'rewards after locking to 100%: ' + str(rewards))
+      print('filename: ' + str(fname) + ' rewards after locking to 100%: ' + str(rewards))
       score = np.mean(rewards)
       std = np.std(rewards)
       result = {'steps':n_steps, 'score': score, 'std':std}

@@ -40,6 +40,8 @@ def main():
   parser.add_argument('--n_runs', default=1, type=int)
   parser.add_argument('--gpu', default=0, type=int)
   parser.add_argument('--gpu_limit', default=None, type=int)
+  parser.add_argument('--human_observer', dest='human_observer', action='store_true', default=False,                                      help='Human decides max progress at the end of each trial by typing in a number.')
+
   args = parser.parse_args()
 
   # Configure which GPU to use.
@@ -83,7 +85,12 @@ def main():
     # Run testing and save total rewards with last transition info.
     results = []
     action_counts = []
-    for i in range(dataset.n_episodes):
+    rewards = []
+    recoveries = []
+    successes = []
+
+    # for i in range(int(dataset.n_episodes/2)): # hack to run half the trials
+    for i in range(int(dataset.n_episodes)):
       print(f'Test: {i + 1}/{dataset.n_episodes}')
       episode, seed = dataset.load(i)
       goal = episode[-1]
@@ -91,21 +98,56 @@ def main():
       np.random.seed(seed)
       action_count = 0
       obs, reward, _, info = env.reset(task)
-      for _ in range(task.max_steps):
+      miss = 0.
+      prev_reward = 0.
+      for i in range(task.max_steps):
         act = agent.act(obs, info, goal)
         obs, reward, done, info = env.step(act)
         total_reward += reward
+        if total_reward <= prev_reward:
+          miss = 1.
+        prev_reward = total_reward
         action_count += 1
-        print(f'{done} {total_reward}')
+        # print(f'{done} {total_reward}')
         if done:
           break
+
+      if args.human_observer and total_reward <= 0.99:
+        progress = total_reward
+        while True:
+            try:
+                progress = float(input(" ".join(["For task", name,
+                    "input max structure size (1 to 4): "])))
+                break
+            except ValueError:
+                print("ENTER AN INTEGER!!!!")
+                continue
+        total_reward = progress/4.
+        if total_reward <= 0.99:
+          miss = 1.
+      if miss == 1.:
+        if total_reward <= 0.99:
+          recoveries += [0.]  
+        else:
+          recoveries += [1.]
+      
       results.append((total_reward, info))
       action_counts += [action_count]
+      # print('action counts: ' + str(action_counts))
+      rewards += [total_reward]
+      successes += [1.] if total_reward > 0.99 else [0.]
 
-      # Save results.
-      print('total actions taken: ' + str(sum(action_counts)))
-      pickle.dump(results, open(f'{name}-{args.n_steps}.pkl', 'wb'))
-      pickle.dump(action_counts, open(f'{name}-{args.n_steps}-action-counts.pkl', 'wb'))
+    # Save results.
+    pickle.dump(results, open(f'{name}-{args.n_steps}.pkl', 'wb'))
+    pickle.dump(action_counts, open(f'{name}-{args.n_steps}-action-counts.pkl', 'wb'))
+    print('total actions taken: ' + str(sum(action_counts)))
+    print('recoveries: ' + str(recoveries))
+    print('avg recoveries: ' + str(np.mean(np.array(recoveries))))
+    print('total_rewards: ' + str(rewards))
+    print('avg_total_rewards: ' + str(np.mean(np.array(rewards))))
+    print('successes: ' + str(successes))
+    print('avg successes: ' + str(np.mean(np.array(successes))))
+
 
 if __name__ == '__main__':
   main()

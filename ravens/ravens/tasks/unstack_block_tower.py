@@ -79,9 +79,9 @@ class UnstackBlockTower(Task):
 
     # unstack the blocks into a row
     place_pos = [(0, (block_size[y] + space) * i - block_size[y], 0.03) for i in range(goal_height)]
-    print('place_pos: ' + str(place_pos))
+    # print('place_pos: ' + str(place_pos))s
     targs = [(utils.apply(base_pose, i), base_pose[rot]) for i in place_pos]
-    print('target positions: ' + str(targs))
+    # print('target positions: ' + str(targs))
 
     # swap first and last goal positions, because bottom block stays where it is
     targs[0], targs[-1] = targs[-1], targs[0]
