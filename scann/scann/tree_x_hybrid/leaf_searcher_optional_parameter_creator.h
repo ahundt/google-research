@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@
 #include "scann/data_format/datapoint.h"
 #include "scann/utils/types.h"
 
-#ifndef SCANN__TREE_X_HYBRID_LEAF_SEARCHER_OPTIONAL_PARAMETER_CREATOR_H_
-#define SCANN__TREE_X_HYBRID_LEAF_SEARCHER_OPTIONAL_PARAMETER_CREATOR_H_
+#ifndef SCANN_TREE_X_HYBRID_LEAF_SEARCHER_OPTIONAL_PARAMETER_CREATOR_H_
+#define SCANN_TREE_X_HYBRID_LEAF_SEARCHER_OPTIONAL_PARAMETER_CREATOR_H_
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 template <typename T>
 class LeafSearcherOptionalParameterCreator {
@@ -33,7 +32,6 @@ class LeafSearcherOptionalParameterCreator {
   CreateLeafSearcherOptionalParameters(const DatapointPtr<T>& query) const = 0;
 };
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

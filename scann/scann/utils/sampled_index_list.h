@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
 
 
 
-#ifndef SCANN__UTILS_SAMPLED_INDEX_LIST_H_
-#define SCANN__UTILS_SAMPLED_INDEX_LIST_H_
+#ifndef SCANN_UTILS_SAMPLED_INDEX_LIST_H_
+#define SCANN_UTILS_SAMPLED_INDEX_LIST_H_
 
 #include "absl/types/variant.h"
 #include "scann/utils/types.h"
 #include "tensorflow/core/platform/macros.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 namespace internal {
 
 template <typename Index>
@@ -91,7 +90,6 @@ void SampledIndexList<Index>::RestartIndex() {
 }
 
 }  // namespace internal
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

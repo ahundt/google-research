@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,8 +21,7 @@ ABSL_RETIRED_FLAG(
     "RETIRED!  Previously:  If true, uses FastTopNeighbors in "
     "traditional ScaNN server.  FastTopNeighbors is always used in DR server.");
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 Status DisabledTypeError(TypeTag type_tag) {
   return FailedPreconditionError(
@@ -107,5 +106,4 @@ string_view TypeNameFromTag(TypeTag type_tag) {
   }
 }
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

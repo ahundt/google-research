@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -246,7 +246,7 @@ class OutOfGraphPrioritizedReplayBuffer(
 
 
 @gin.configurable(
-    blacklist=['observation_shape', 'stack_size', 'update_horizon'])
+    denylist=['observation_shape', 'stack_size', 'update_horizon'])
 class WrappedPrioritizedReplayBuffer(
     circular_replay_buffer.WrappedReplayBuffer):
   """Wrapper of OutOfGraphPrioritizedReplayBuffer with in-graph sampling.

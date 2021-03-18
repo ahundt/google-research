@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
 
 
 
-#ifndef SCANN__UTILS_INFINITE_ONE_ARRAY_H_
-#define SCANN__UTILS_INFINITE_ONE_ARRAY_H_
+#ifndef SCANN_UTILS_INFINITE_ONE_ARRAY_H_
+#define SCANN_UTILS_INFINITE_ONE_ARRAY_H_
 
 #include "scann/utils/types.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 template <typename T>
 class InfiniteOneIterator {
@@ -63,7 +62,6 @@ class InfiniteOneMatrix {
   InfiniteOneArray<T> back() const { return InfiniteOneArray<T>(); }
 };
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -578,9 +578,10 @@ op2ind[lax.div_p] = broadcast2ind
 def dot_general2tex(a: BoundASTNode,
                     b: BoundASTNode,
                     dimension_numbers: lax.DotDimensionNumbers,
-                    precision) -> str:
+                    precision,
+                    preferred_element_type) -> str:
   """Converts dot_general op to latex."""
-  del precision
+  del precision, preferred_element_type
 
   ((a_contract_dims, _),
    (a_broadcast_dims, _)) = dimension_numbers
@@ -611,9 +612,10 @@ def dot_general2ind(in_shaped: Tuple[ShapedArray, ...],
                     out_indices: str,
                     out_used: str,
                     dimension_numbers: lax.DotDimensionNumbers,
-                    precision) -> Tuple[str, ...]:
+                    precision,
+                    preferred_element_type) -> Tuple[str, ...]:
   """Computes indices of inputs given indices of outputs for dot_general."""
-  del precision
+  del precision, preferred_element_type
 
   ((a_contract_dims, b_contract_dims), _) = dimension_numbers
   a, b = in_shaped

@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@
 #include "scann/proto/projection.pb.h"
 #include "scann/utils/types.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 Status FixRemainderDims(const DimensionIndex input_dim,
                         const ProjectionConfig& config,
@@ -103,5 +102,4 @@ StatusOr<unique_ptr<Projection<T>>> ProjectionFactoryImpl<T>::Create(
 
 SCANN_INSTANTIATE_TYPED_CLASS(, ProjectionFactoryImpl);
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

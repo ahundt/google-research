@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
 # limitations under the License.
 
 """This file implements tree node class for a Monte Carlo Tree Search (MCTS)."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 import collections
 import math
 from absl import logging
@@ -63,7 +60,7 @@ class DummyNode(object):
 
 
 @gin.configurable(
-    blacklist=['num_steps', 'reward', 'move', 'parent', 'mask', 'done'])
+    denylist=['num_steps', 'reward', 'move', 'parent', 'mask', 'done'])
 class MCTSNode(object):
   """A node of a MCTS search tree.
 

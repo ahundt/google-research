@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -197,18 +197,10 @@ class PPMLanguageModel {
   addSymbolToNode_(node, symbol) {
     let symbolNode = node.findChildWithSymbol(symbol);
     if (symbolNode != null) {
-      // Update the counts for the given node and also for all the backoff nodes
-      // representing shorter contexts.
+      // Update the counts for the given node.  Only updates the counts for
+      // the highest order already existing node for the symbol ('single
+      // counting' or 'update exclusion').
       symbolNode.count_++;
-      let backoffNode = symbolNode.backoff_;
-      assert(backoffNode != null, "Expected valid backoff node!");
-      while (backoffNode != null) {
-        assert(backoffNode == this.root_ || backoffNode.symbol_ == symbol,
-               "Expected backoff node to be root or to contain " + symbol +
-               ". Found " + backoffNode.symbol_ + " instead");
-        backoffNode.count_++;
-        backoffNode = backoffNode.backoff_;
-      }
     } else {
       // Symbol does not exist under the given node. Create a new child node
       // and update the backoff structure for lower contexts.

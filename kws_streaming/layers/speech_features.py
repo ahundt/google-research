@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -187,6 +187,9 @@ class SpeechFeatures(tf.keras.layers.Layer):
 
     if self.params['mel_num_bins'] <= 0:
       raise ValueError('mel_num_bins for mfcc_op has to be > 0')
+
+    if not self.params['use_one_step']:
+      raise ValueError('_mfcc_op supports only use_one_step=True')
 
     # MFCC implementation based on TF custom op (supported by TFLite)
     # It reduces model size in comparison to _mfcc_tf

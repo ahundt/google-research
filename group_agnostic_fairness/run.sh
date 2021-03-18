@@ -1,4 +1,4 @@
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,8 +24,7 @@ pip3 install -r group_agnostic_fairness/requirements.txt
 # Select from the following models or tests to run.
 python -m group_agnostic_fairness.main_trainer
 python -m group_agnostic_fairness.main_trainer_test
-python -m group_agnostic_fairness.robust_learning_model_test
+python -m group_agnostic_fairness.adversarial_reweighting_model_test
 python -m group_agnostic_fairness.fairness_metrics_test
-python -m group_agnostic_fairness.adversarial_subgroup_reweighting_model_test
 python -m group_agnostic_fairness.baseline_model_test
 python -m group_agnostic_fairness.ips_reweighting_model_test

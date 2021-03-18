@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCANN__HASHES_ASYMMETRIC_HASHING2_SERIALIZATION_H_
-#define SCANN__HASHES_ASYMMETRIC_HASHING2_SERIALIZATION_H_
+#ifndef SCANN_HASHES_ASYMMETRIC_HASHING2_SERIALIZATION_H_
+#define SCANN_HASHES_ASYMMETRIC_HASHING2_SERIALIZATION_H_
 
 #include "scann/data_format/datapoint.h"
 #include "scann/data_format/dataset.h"
 #include "scann/proto/centers.pb.h"
 #include "scann/proto/hash.pb.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 namespace asymmetric_hashing2 {
 
 template <typename T>
@@ -41,7 +40,6 @@ CentersForAllSubspaces DatasetSpanToCentersProto(
 }
 
 }  // namespace asymmetric_hashing2
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import tempfile
 from absl.testing import absltest
 import tensorflow.compat.v1 as tf
 
-from group_agnostic_fairness import robust_learning_model
+from group_agnostic_fairness import adversarial_reweighting_model
 from group_agnostic_fairness.data_utils.uci_adult_input import UCIAdultInput
 from group_agnostic_fairness.fairness_metrics import RobustFairnessMetrics
 
@@ -73,7 +73,7 @@ class FairnessMetricsTest(tf.test.TestCase, absltest.TestCase):
                                     save_checkpoints_steps=1)
     feature_columns, _, _, label_column_name = (
         self.load_dataset.get_feature_columns(include_sensitive_columns=True))
-    estimator = robust_learning_model.get_estimator(
+    estimator = adversarial_reweighting_model.get_estimator(
         feature_columns=feature_columns,
         label_column_name=label_column_name,
         config=config,

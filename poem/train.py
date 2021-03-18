@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from poem import train_base
 from poem.core import common
 from poem.core import input_generator
 from poem.core import keypoint_profiles
+from poem.core import models
 tf.disable_v2_behavior()
 
 FLAGS = flags.FLAGS
@@ -39,10 +40,12 @@ def main(_):
       input_dataset_class=tf.data.TFRecordDataset,
       common_module=common,
       keypoint_profiles_module=keypoint_profiles,
-      tfe_parser_creator=None,
+      models_module=models,
+      input_example_parser_creator=None,
       keypoint_preprocessor_3d=input_generator.preprocess_keypoints_3d,
       create_model_input_fn=input_generator.create_model_input,
-      keypoint_distance_config_override={})
+      keypoint_distance_config_override={},
+      embedder_fn_kwargs={})
 
 
 if __name__ == '__main__':

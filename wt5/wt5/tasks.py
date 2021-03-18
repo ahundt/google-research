@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,8 +32,10 @@ TaskRegistry = t5.data.TaskRegistry
 TfdsTask = t5.data.TfdsTask
 
 DEFAULT_OUTPUT_FEATURES = {
-    "inputs": t5.data.Feature(vocabulary=get_default_vocabulary, add_eos=True),
-    "targets": t5.data.Feature(vocabulary=get_default_vocabulary, add_eos=True)
+    "inputs":
+        t5.data.Feature(vocabulary=get_default_vocabulary(), add_eos=True),
+    "targets":
+        t5.data.Feature(vocabulary=get_default_vocabulary(), add_eos=True)
 }
 
 # ======================== CoS-E Corpus Task ==================================

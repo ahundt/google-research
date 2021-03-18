@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 namespace sketch {
 
 typedef unsigned int uint;
-typedef unsigned long long ULONG;
+typedef uint64 ULONG;
 typedef std::pair<uint, float> IntFloatPair;
 
 inline constexpr int HL = 31;

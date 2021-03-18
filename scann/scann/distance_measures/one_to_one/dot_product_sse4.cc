@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
 
 #include "scann/utils/intrinsics/sse4.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 namespace dp_internal {
 
 template <typename Byte, typename SseFuncs>
@@ -540,7 +539,6 @@ SCANN_SSE4_OUTLINE double DenseDotProductSse4(const DatapointPtr<int8_t>& a,
 }
 
 }  // namespace dp_internal
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 
 
 #include "scann/tree_x_hybrid/tree_x_params.h"
+
 #include "scann/base/search_parameters.h"
 #include "scann/utils/types.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 TreeXOptionalParameters::TreeXOptionalParameters() {}
 TreeXOptionalParameters::~TreeXOptionalParameters() {}
@@ -69,5 +69,4 @@ Status TreeXOptionalParameters::EnablePreTokenization(
   return OkStatus();
 }
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

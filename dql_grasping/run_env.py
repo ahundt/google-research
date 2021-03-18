@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ def encode_image_array_as_png_str(image):
   return png_string
 
 
-@gin.configurable(blacklist=['task', 'num_episodes', 'global_step', 'tag'])
+@gin.configurable(denylist=['task', 'num_episodes', 'global_step', 'tag'])
 def run_env(env,
             policy=None,
             explore_schedule=None,

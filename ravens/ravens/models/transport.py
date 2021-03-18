@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ class Transport:
     in_shape = tuple(in_shape)
 
     # Crop before network (default for Transporters in CoRL submission).
-    # kernel_shape = (self.crop_size, self.crop_size, in_shape[2])
+    kernel_shape = (self.crop_size, self.crop_size, in_shape[2])
 
     # The result is True if the string is the name of one of the object’s attributes
     if not hasattr(self, 'output_dim'):
@@ -344,8 +344,17 @@ class Transport:
     # crop = tf.identity(kernel_bef_crop)
     crop = tf.repeat(crop, repeats=self.n_rotations, axis=0)
     crop = tfa.image.transform(crop, rvecs, interpolation='NEAREST')
-    kernel_raw = crop[:, p[0]:(p[0] + self.crop_size),
-                      p[1]:(p[1] + self.crop_size), :]
+    crop = crop[:, p[0]:(p[0] + self.crop_size),
+                p[1]:(p[1] + self.crop_size), :]
+    logits, kernel_raw = self.model([in_tensor, crop])
+
+    # Crop after network (for receptive field, and more elegant).
+    # logits, crop = self.model([in_tensor, in_tensor])
+    # # crop = tf.identity(kernel_bef_crop)
+    # crop = tf.repeat(crop, repeats=self.n_rotations, axis=0)
+    # crop = tfa.image.transform(crop, rvecs, interpolation='NEAREST')
+    # kernel_raw = crop[:, p[0]:(p[0] + self.crop_size),
+    #                   p[1]:(p[1] + self.crop_size), :]
 
     # Obtain kernels for cross-convolution.
     kernel_paddings = tf.constant([[0, 0], [0, 1], [0, 1], [0, 0]])

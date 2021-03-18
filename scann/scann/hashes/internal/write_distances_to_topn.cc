@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
 #include "scann/base/restrict_allowlist.h"
 #include "scann/utils/intrinsics/sse4.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 namespace asymmetric_hashing_internal {
 
 #ifdef __SSE4_1__
@@ -276,5 +275,4 @@ void WriteDistancesToTopN(const RestrictAllowlist* whitelist_or_null,
 #endif
 
 }  // namespace asymmetric_hashing_internal
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

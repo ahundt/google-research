@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 #ifndef SLIDING_WINDOW_CLUSTERING_BASE_H_
 #define SLIDING_WINDOW_CLUSTERING_BASE_H_
 
+// Forcing the asserts to be checked in release mode.
+#undef NDEBUG
 #include <algorithm>
 #include <cassert>
 #include <cmath>

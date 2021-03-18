@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@
 
 For the PPO algorithm, see https://arxiv.org/abs/1707.06347.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 from absl import logging
 import gin
 import numpy as np

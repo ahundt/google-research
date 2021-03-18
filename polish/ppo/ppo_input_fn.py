@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@ multiple training steps. This input_fn is a subclass of tf.train.SessionRunHook
 that enables us to extend calls to MonitoredSession.run() with
 user-defined functions.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 import collections
 import functools
 import os

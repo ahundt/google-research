@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -334,7 +334,8 @@ class MultiGridEnv(minigrid.MiniGridEnv):
       n_agents=3,
       competitive=False,
       fixed_environment=False,
-      minigrid_mode=False
+      minigrid_mode=False,
+      fully_observed=False
   ):
     """Constructor for multi-agent gridworld environment generator.
 
@@ -358,7 +359,12 @@ class MultiGridEnv(minigrid.MiniGridEnv):
         environment each time.
       minigrid_mode: Set to True to maintain backwards compatibility with
         minigrid in the single agent case.
+      fully_observed: If True, each agent will receive an observation of the
+        full environment state, rather than a partially observed, ego-centric
+        observation.
     """
+    self.fully_observed = fully_observed
+
     # Can't set both grid_size and width/height
     if grid_size:
       assert width is None and height is None
@@ -379,6 +385,8 @@ class MultiGridEnv(minigrid.MiniGridEnv):
 
     # Number of cells (width and height) in the agent view
     self.agent_view_size = agent_view_size
+    if self.fully_observed:
+      self.agent_view_size = grid_size
 
     # Range of possible rewards
     self.reward_range = (0, 1)
@@ -416,9 +424,15 @@ class MultiGridEnv(minigrid.MiniGridEnv):
 
     # Observations are dictionaries containing an encoding of the grid and the
     # agent's direction
-    self.observation_space = gym.spaces.Dict(
-        {'image': self.image_obs_space,
-         'direction': self.direction_obs_space})
+    observation_space = {'image': self.image_obs_space,
+                         'direction': self.direction_obs_space}
+    if self.fully_observed:
+      self.position_obs_space = gym.spaces.Box(low=0,
+                                               high=max(width, height),
+                                               shape=(self.n_agents, 2),
+                                               dtype='uint8')
+      observation_space['position'] = self.position_obs_space
+    self.observation_space = gym.spaces.Dict(observation_space)
 
     # Window to use for human rendering mode
     self.window = None
@@ -994,10 +1008,16 @@ class MultiGridEnv(minigrid.MiniGridEnv):
     """Generate the stacked observation for all agents."""
     images = []
     dirs = []
+    positions = []
     for a in range(self.n_agents):
-      image, direction = self.gen_agent_obs(a)
+      if self.fully_observed:
+        image = self.grid.encode()
+        direction = self.agent_dir[a]
+      else:
+        image, direction = self.gen_agent_obs(a)
       images.append(image)
       dirs.append(direction)
+      positions.append(self.agent_pos[a])
 
     # Backwards compatibility: if there is a single agent do not return an array
     if self.minigrid_mode:
@@ -1011,6 +1031,8 @@ class MultiGridEnv(minigrid.MiniGridEnv):
         'image': images,
         'direction': dirs
     }
+    if self.fully_observed:
+      obs['position'] = positions
 
     return obs
 

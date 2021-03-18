@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 """Models for distillation."""
 
 import tensorflow as tf
+import tensorflow_model_optimization as tfmot
+from non_semantic_speech_benchmark.distillation.layers import CompressedDense
 from non_semantic_speech_benchmark.export_model import tf_frontend
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.keras.applications import mobilenet_v3 as v3_util
@@ -33,8 +35,11 @@ def get_keras_model(bottleneck_dimension,
                     alpha=1.0,
                     mobilenet_size='small',
                     frontend=True,
-                    avg_pool=False):
-  """Make a keras student model."""
+                    avg_pool=False,
+                    compressor=None,
+                    qat=False,
+                    tflite=False):
+  """Make a Keras student model."""
 
   def _map_fn_lambda(x):
     return tf.map_fn(_sample_to_features, x, dtype=tf.float64)
@@ -45,9 +50,13 @@ def get_keras_model(bottleneck_dimension,
         'small': tf.keras.applications.MobileNetV3Small,
         'large': tf.keras.applications.MobileNetV3Large,
     }
-    assert mnet_size in mnet_size_map
+    if mnet_size.lower() not in mnet_size_map:
+      raise ValueError('Unknown MobileNet size %s.' % mnet_size)
     return mnet_size_map[mnet_size.lower()]
 
+  # TFLite use-cases usually use non-batched inference, and this also enables
+  # hardware acceleration.
+  num_batches = 1 if tflite else None
   if frontend:
     model_in = tf.keras.Input((None,), name='audio_samples')
     feats = tf.keras.layers.Lambda(_map_fn_lambda)(model_in)
@@ -55,7 +64,9 @@ def get_keras_model(bottleneck_dimension,
     feats = tf.transpose(feats, [0, 2, 1, 3])
     feats = tf.reshape(feats, [-1, 96, 64, 1])
   else:
-    model_in = tf.keras.Input((96, 64, 1), name='log_mel_spectrogram')
+    model_in = tf.keras.Input((96, 64, 1),
+                              name='log_mel_spectrogram',
+                              batch_size=num_batches)
     feats = model_in
   model = _map_mobilenet_func(mobilenet_size)(
       input_shape=[96, 64, 1],
@@ -71,19 +82,37 @@ def get_keras_model(bottleneck_dimension,
   else:
     model_out.shape.assert_is_compatible_with([None, 3, 2, None])
   if bottleneck_dimension:
+    if compressor is not None:
+      bottleneck = CompressedDense(
+          bottleneck_dimension,
+          compression_obj=compressor,
+          name='distilled_output')
+    else:
+      bottleneck = tf.keras.layers.Dense(
+          bottleneck_dimension, name='distilled_output')
+      if qat:
+        bottleneck = tfmot.quantization.keras.\
+          quantize_annotate_layer(bottleneck)
     embeddings = tf.keras.layers.Flatten()(model_out)
-    embeddings = tf.keras.layers.Dense(
-        bottleneck_dimension, name='distilled_output')(
-            embeddings)
+    embeddings = bottleneck(embeddings)
+
+    if tflite:
+      # We generate TFLite models just for the embeddings.
+      output_model = tf.keras.Model(inputs=model_in, outputs=embeddings)
+      if compressor is not None:
+        # If model employs compression, this ensures that the TFLite model
+        # just uses the smaller matrices for inference.
+        output_model.get_layer('distilled_output').kernel = None
+        output_model.get_layer(
+            'distilled_output').compression_op.a_matrix_tfvar = None
+      return output_model
   else:
     embeddings = tf.keras.layers.Flatten(name='distilled_output')(model_out)
-  # TODO(joelshor): These final layers can be large. Investigate the compression
-  # techniques described in
-  # https://blog.tensorflow.org/2020/02/matrix-compression-operator-tensorflow.html?m=1
   output = tf.keras.layers.Dense(
       output_dimension, name='embedding_to_target')(
           embeddings)
-  return tf.keras.Model(inputs=model_in, outputs=output)
+  output_model = tf.keras.Model(inputs=model_in, outputs=output)
+  return output_model
 
 
 def mobilenetv3_tiny(input_shape=None,

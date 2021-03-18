@@ -1,0 +1,821 @@
+
+
+Stack block tower on base 2021-02-22
+Commit: 71dea570ac036f8686cb67c2d8c174b7b33cb2ee
+export CUDA_VISIBLE_DEVICES="0" && python3 demos.py --disp --task=stack-block-tower --mode=train --n=2 && python3 demos.py --disp --task=stack-block-tower --mode=test --n=2
+export CUDA_VISIBLE_DEVICES="0" && python3 train.py --task=stack-block-tower --agent=transporter --n_demos=2 --n_steps 5000 && python3 test.py --disp --task=stack-block-tower --agent=transporter --n_demos=2 --n_steps=5000
+costar@costar-desktop|~/src/google-research/ravens on good_robot!?
+± export CUDA_VISIBLE_DEVICES="0" && python3 plot.py --disp --task=stack-block-tower --agent=transporter --n_demos=2
+
+1 cm 30 degrees
+[1.0, 1.0, 0, 0.5, 0.25, 0.75, 0, 1.0, 0.5, 0.25, 0, 1.0, 0.5, 0, 0.75, 0.25, 0.5, 0.25, 1.0, 0, 0.75, 0.5, 0.25, 0.25, 0, 0.25, 0, 0, 0.5, 1.0, 0, 0.25, 0.75, 0, 0.5, 1.0, 0.75, 0.25, 0.25, 1.0, 0.5, 1.0, 0.25, 0.25, 0.25, 1.0, 0, 0, 0, 0, 0.25, 0, 0.25, 1.0, 0, 0, 0.75, 0, 0.25, 0.25, 0, 0.75, 0, 0, 0.25, 0.5, 0, 0.5, 0.5, 0.75, 0.25, 0.75, 1.0, 0.25, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0, 0.5, 1.0, 0, 0.5, 1.0, 1.0, 0, 1.0, 1.0, 0, 0.75, 0.75, 1.0, 1.0, 0, 1.0]
+  5000 steps:   22.0%   ± 41.4%
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: stack-block-tower-transporter-2--plot.png
+costar@costar-desktop|~/src/google-research/ravens on good_robot!?
+± cp stack-block-tower-transporter-2--plot.png stack-block-tower-transporter-2--plot-1.5cm-translation-30deg-error-ok-22-percent-trial-success.png
+
+
+1cm 180 degrees 
+2021-02-23 00:11:50.047095: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-tower-transporter-2-
+[1.0, 1.0, 0, 1.0, 0.75, 1.0, 0, 0.75, 1.0, 0.75, 1.0, 1.0, 1.0, 0.75, 0, 1.0, 0.75, 1.0, 1.0, 0.25, 1.0, 0.5, 0, 0.25, 0, 1.0, 0, 1.0, 1.0, 1.0, 0.25, 1.0, 0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0, 0.25, 1.0, 0, 1.0, 0.75, 1.0, 0.5, 0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.25, 1.0, 0.75, 1.0, 0.25, 0.75, 0, 1.0, 0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.25, 0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0, 1.0, 0.75, 1.0, 1.0, 1.0, 1.0, 0.75, 1.0, 1.0, 1.0, 1.0]
+  5000 steps:   66.0%   ± 47.4%
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: stack-block-tower-transporter-2--plot.png
+
+
+1.5cm 180 degrees -> about 80% (need to rerun)
+
+stack block pyrimid
+export CUDA_VISIBLE_DEVICES="0" && python3 demos.py --disp --task=stack-block-tower --mode=train --n=2 && python3 demos.py --disp --task=stack-block-tower --mode=test --n=2
+export CUDA_VISIBLE_DEVICES="0" && python3 train.py --task=stack-block-pyramid --agent=transporter --n_demos=2 --n_steps=5000 && python3 test.py --disp --task=stack-block-pyramid --agent=transporter --n_demos=2 --n_steps=5000
+
+
+
+
+--------------------------------------------------------------------
+
+
+
+Collect datasets:
+
+export CUDA_VISIBLE_DEVICES="1" && python3 demos.py --disp --task=stack-block-tower --mode=train --n=2 && python3 demos.py --disp --task=stack-block-tower --mode=test --n=100
+export CUDA_VISIBLE_DEVICES="1" && python3 demos.py --disp --task=block-row --mode=train --n=2 && python3 demos.py --disp --task=block-row --mode=test --n=100
+export CUDA_VISIBLE_DEVICES="1" && python3 demos.py --disp --task=stack-block-vertical-square --mode=train --n=2 && python3 demos.py --disp --task=stack-block-vertical-square --mode=test --n=100
+export CUDA_VISIBLE_DEVICES="1" && python3 demos.py --disp --task=unstack-block-tower --mode=train --n=2 && python3 demos.py --disp --task=unstack-block-tower --mode=test --n=100
+
+
+train models then run them:
+
+export CUDA_VISIBLE_DEVICES="1" && python3 train.py --task=stack-block-tower --agent=transporter --n_demos=2 --n_steps=5000 && python3 test.py --disp --task=stack-block-tower --agent=transporter --n_demos=2 --n_steps=5000 && python3 plot.py --disp --task=stack-block-tower --agent=transporter --n_demos=2
+export CUDA_VISIBLE_DEVICES="1" && python3 train.py --task=block-row --agent=transporter --n_demos=2 --n_steps=5000 && python3 test.py --disp --task=block-row --agent=transporter --n_demos=2 --n_steps=5000 && python3 plot.py --disp --task=block-row --agent=transporter --n_demos=2
+export CUDA_VISIBLE_DEVICES="1" && python3 train.py --task=stack-block-vertical-square --agent=transporter --n_demos=2 --n_steps=5000 && python3 test.py --disp --task=stack-block-vertical-square --agent=transporter --n_demos=2 --n_steps=5000 && python3 plot.py --disp --task=stack-block-vertical-square --agent=transporter --n_demos=2
+export CUDA_VISIBLE_DEVICES="1" && python3 train.py --task=unstack-block-tower --agent=transporter --n_demos=2 --n_steps=5000 && python3 test.py --disp --task=unstack-block-tower --agent=transporter --n_demos=2 --n_steps=5000 && python3 plot.py --disp --task=unstack-block-tower --agent=transporter --n_demos=2
+
+
+run trained models (assume training is already done):
+
+export CUDA_VISIBLE_DEVICES="1" && python3 test.py --disp --task=stack-block-tower --agent=transporter --n_demos=2 --n_steps=5000 && python3 plot.py --disp --task=stack-block-tower --agent=transporter --n_demos=2
+export CUDA_VISIBLE_DEVICES="1" && python3 test.py --disp --task=block-row --agent=transporter --n_demos=2 --n_steps=5000 && python3 plot.py --disp --task=block-row --agent=transporter --n_demos=2
+export CUDA_VISIBLE_DEVICES="1" && python3 test.py --disp --task=stack-block-vertical-square --agent=transporter --n_demos=2 --n_steps=5000 && python3 plot.py --disp --task=stack-block-vertical-square --agent=transporter --n_demos=2
+export CUDA_VISIBLE_DEVICES="1" && python3 test.py --disp --task=unstack-block-tower --agent=transporter --n_demos=2 --n_steps=5000 && python3 plot.py --disp --task=unstack-block-tower --agent=transporter --n_demos=2
+
+
+
+--------------------------------------------------------------------
+Ravens Task Results 2020-02-24-1800
+
+Note: Need to set stand and block physics params to be realistic values in the urdf files located in ravens/assets/stacking:
+lateral friction: 0.5
+rolling friction: 0.01
+intertia scaling: 1.0
+translation epsilon: 1.0 cm
+rotation epsilon: 180 degrees
+
+
+ravens task results
+
+stack:
+± python3 plot.py --disp --task=stack-block-tower --agent=transporter --n_demos=2
+pybullet build time: Nov 26 2020 23:07:47
+2021-02-24 18:29:34.720675: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-tower-transporter-2-
+[0.75, 0.25, 1.0, 0.75, 0.25, 0.75, 0, 1.0, 0, 0, 0.25, 1.0, 0.5, 0.5, 0, 0.75, 0.5, 0.75, 0, 1.0, 0.75, 0.75, 0, 0.75, 0.75, 0.75, 1.0, 0.75, 1.0, 0.5, 0.75, 0.5, 0.75, 0.5, 0, 1.0, 0.5, 0, 0, 0.5, 0.75, 0.5, 0.5, 0, 0.75, 0.75, 0.25, 1.0, 0.75, 0.5, 0, 0.5, 0, 1.0, 0.25, 0.5, 0.75, 0.5, 0, 0, 1.0, 0.5, 0.25, 0.5, 0.25, 0.75, 0, 1.0, 0.5, 0, 1.0, 0.25, 0, 0.5, 0.75, 0.5, 0.5, 0.75, 1.0, 0.5, 0.25, 0, 0.5, 0.25, 0.75, 0, 0, 0.75, 0.75, 0.5, 0.5, 0.5, 0.5, 0, 1.0, 1.0, 0.75, 0, 0.25, 0.5]
+  5000 steps:   15.0%   ± 35.7%
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+
+row:
+± python3 plot.py --disp --task=block-row --agent=transporter --n_demos=2
+pybullet build time: Nov 26 2020 23:07:47
+2021-02-24 18:42:50.184709: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+block-row-transporter-2-
+[0.5, 0, 0.75, 0, 0, 0.75, 0.75, 0, 0, 0.75, 0.25, 0.5, 0, 0.75, 0.25, 0, 0, 0.75, 0.25, 0, 0, 0.25, 0.25, 0, 0, 0.75, 0, 0, 0, 0.25, 0, 0.75, 0, 0, 0, 0.5, 0.25, 0, 0.25, 0.25, 0, 0, 0, 0, 0.25, 0, 0, 0.75, 0, 0, 0.25, 0.5, 0, 0.25, 0.25, 0.5, 0.25, 0.75, 0, 0.25, 0.5, 0, 0.25, 0, 0, 0.5, 0.75, 0.75, 0, 0, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.75, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0.5, 0.25, 0, 0, 0, 0.5, 0, 0, 0]
+  5000 steps:   0.0%    ± 0.0%
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+
+
+vertical square:
+pybullet build time: Nov 26 2020 23:07:47
+2021-02-24 18:44:12.342298: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-vertical-square-transporter-2-
+[1.0, 0, 0.5, 0, 0, 0.5, 0.25, 0, 0.5, 0.75, 0.5, 0.25, 0, 0.25, 0.25, 0, 0, 0.5, 0.75, 0, 0, 0, 0.25, 0, 0, 0.75, 0, 0, 0, 1.0, 0.25, 1.0, 0, 0, 0, 0.25, 0.25, 0, 0.25, 1.0, 1.0, 0, 0, 0, 0.25, 0.75, 0, 0, 0, 0, 1.0, 0.25, 0, 1.0, 1.0, 0, 0.25, 0.75, 1.0, 0.75, 1.0, 0, 0.25, 0, 0, 1.0, 0.5, 1.0, 0, 0, 0.25, 0.75, 0, 0, 0, 0, 0, 0.25, 0, 0, 0, 0.75, 0, 1.0, 0, 0, 0, 0.5, 0, 0, 0.25, 0.25, 0, 0, 0, 0.25, 0.5, 0.25, 0, 1.0]
+  5000 steps:   14.0%   ± 34.7%
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: stack-block-vertical-square-transporter-2--plot.png
+
+
+Manual count of unstacking trial success: 92/100 = 92%
+
+
+--------------------------------------------------------------------
+Ravens Task Results 2020-02-24-2200
+
+Note: Need to set stand and block physics params to be realistic values in the urdf files located in ravens/assets/stacking:
+lateral friction: 0.5
+rolling friction: 0.001
+intertia scaling: 2.0
+translation epsilon: 1.5 cm
+rotation epsilon: 180 degrees
+
+
+block tower:
+± python3 plot.py --disp --task=stack-block-tower --agent=transporter --n_demos=2
+pybullet build time: Nov 26 2020 23:07:47
+2021-02-25 08:50:26.588373: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-tower-transporter-2-
+[0.75, 1.0, 1.0, 1.0, 1.0, 0.75, 0, 0.75, 0.5, 0, 0.25, 1.0, 1.0, 0.75, 0.25, 1.0, 0.5, 0.75, 0, 1.0, 1.0, 1.0, 0.75, 0.5, 0.75, 0.75, 0.75, 1.0, 1.0, 0.75, 0.75, 1.0, 1.0, 0.25, 0.75, 1.0, 0.5, 0, 1.0, 0.5, 0.75, 1.0, 1.0, 1.0, 0.75, 1.0, 1.0, 1.0, 1.0, 0.5, 0, 1.0, 0, 0.75, 0.5, 0.5, 1.0, 0.5, 0.5, 0.25, 1.0, 1.0, 1.0, 1.0, 0.75, 0.75, 1.0, 1.0, 1.0, 0, 0.75, 0, 1.0, 0.75, 0.75, 0.5, 0.5, 0.75, 0.5, 0.5, 0.75, 0, 0.5, 0.75, 0.75, 0, 0, 1.0, 1.0, 0.5, 0.75, 1.0, 0.5, 0, 1.0, 0.25, 0.75, 0, 0.75, 1.0]
+  5000 steps:   38.0%   ± 48.5%
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: stack-block-tower-transporter-2--plot.png
+
+
+block row:
+pybullet build time: Nov 26 2020 23:07:47
+2021-02-25 08:49:35.107522: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+block-row-transporter-2-
+[0.75, 0, 0.75, 0, 0, 0.75, 0.5, 0, 0, 0.75, 0.25, 0.75, 0, 0.75, 0.25, 0, 0, 0.25, 0.25, 0, 0, 0.25, 0.5, 0, 0, 0.75, 0, 0, 0, 0, 0, 0.75, 0, 0, 0, 0.5, 0.25, 0, 0.5, 0.5, 0, 0, 0, 0, 1.0, 0, 0, 0.75, 0, 0, 0.5, 0.5, 0, 0.25, 0.25, 0.5, 0.5, 0.75, 0, 0.25, 0.5, 0, 0.25, 0, 0, 0.5, 0.75, 0.75, 0, 0, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0.75, 0, 0.75, 0, 0.75, 0, 0, 0, 0.75, 0, 0.75, 0.5, 1.0, 0, 0, 0, 0.75, 0, 0, 0]
+  5000 steps:   2.0%    ± 14.0%
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: block-row-transporter-2--plot.png
+
+
+
+vertical square:
+2021-02-24 22:42:57.788787: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-vertical-square-transporter-2-
+[1.0, 0, 1.0, 0, 0, 1.0, 0.25, 0, 0.75, 1.0, 1.0, 0.25, 0, 1.0, 0.25, 0, 0, 0.5, 0.5, 0, 0, 0.75, 0.25, 0, 0, 0.75, 0, 0.25, 0, 1.0, 0.25, 1.0, 0, 0, 0.5, 1.0, 0.25, 0, 0.75, 1.0, 1.0, 0, 0, 0, 0.25, 1.0, 0, 0.25, 0, 0, 1.0, 0.25, 0, 0.25, 1.0, 0, 0.25, 0.5, 1.0, 1.0, 1.0, 0, 0.25, 0, 0, 1.0, 0.5, 1.0, 0, 0, 0.25, 1.0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0, 1.0, 0, 0, 0, 1.0, 0, 0, 0.75, 0.75, 0, 0, 0, 0.25, 0.5, 0, 0, 1.0]
+  5000 steps:   25.0%   ± 43.3%
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: stack-block-vertical-square-transporter-2--plot.png
+total actions taken: 1008
+Efficiency: 59% = 600/1008
+
+unstack:
+2021-03-02 15:57:58.155055: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+unstack-block-tower-transporter-2-
+[1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 1.0, 0.6666666666666666, 0, 0, 0, 0, 0, 0.3333333333333333, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 1.0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.3333333333333333, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0]
+  5000 steps:   12.0%   ± 32.5%
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: unstack-block-tower-transporter-2--plot.png
+
+Manual count of unstacking trial success: 92/100 = 92%
+
+
+
+
+--------------------------------------------------------------------
+Ravens Task Results 2020-03-02
+
+Note: Need to set stand and block physics params to be realistic values in the urdf files located in ravens/assets/stacking:
+lateral friction: 0.5
+rolling friction: 0.001
+intertia scaling: 2.0
+translation epsilon: 1.0 cm (except unstacking, where it is 5.0 cm)
+rotation epsilon: 180 degrees
+
+NOTE: we multiply these action counts by 2, because ravens considers grasp + place a single action, which is 2 actions for "Good Robot!".
+
+stack:
+2021-03-02 18:01:26.966644: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-tower-transporter-2-
+filename: stack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [  0   0 100   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0 100   0   0   0   0   0   0 100   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0 100   0 100 100   0   0 100   0   0
+   0   0   0   0   0   0   0 100 100 100   0   0   0 100   0   0   0   0
+ 100   0   0   0   0   0   0   0   0   0   0   0   0   0   0 100   0   0
+   0 100   0   0 100   0   0   0   0   0]
+  5000 steps:   15.0%   ± 35.7%
+
+total actions taken: 1095
+efficiency: 27% = 600/(1095*2)
+
+
+row:
+2021-03-02 18:53:07.854572: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+block-row-transporter-2-
+filename: block-row-transporter-2-0-5000.pklrewards after locking to 100%: [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0 100   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0 100   0   0   0   0   0   0   0]
+  5000 steps:   2.0%    ± 14.0%
+total actions taken: 1186
+Efficiency: 25% = 600/(1186*2)
+
+
+vertical square:
+filename: stack-block-vertical-square-transporter-2-0-5000.pklrewards after locking to 100%: [100   0   0   0   0 100   0   0   0 100 100   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0 100   0 100   0   0   0 100
+   0   0   0 100 100   0   0   0   0 100   0   0   0   0   0   0   0   0
+ 100   0   0   0 100   0 100   0   0   0   0 100   0 100   0   0   0 100
+   0   0   0   0   0 100   0   0   0   0   0 100   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0 100]
+  5000 steps:   19.0%   ± 39.2%
+count: 0
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: stack-block-vertical-square-transporter-2--plot.png
+
+total actions taken: 1053
+Efficiency: 28%, 600/(1053*2) = 0.2849002849002849
+
+
+
+unstack:
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-02 21:07:28.997103: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+unstack-block-tower-transporter-2-
+filename: unstack-block-tower-transporter-2-0-5000.pklrewards after locking to 100%: [100   0 100   0 100   0   0   0   0   0   0 100 100   0   0 100   0   0
+ 100   0   0   0   0 100   0   0 100   0   0   0   0   0 100 100 100   0
+   0   0   0 100 100 100   0   0   0   0 100 100 100 100   0   0 100 100
+ 100   0 100 100   0   0   0   0 100 100   0 100   0   0 100   0 100   0
+ 100 100 100   0   0   0   0 100 100 100   0   0   0   0   0 100   0   0
+   0   0   0 100   0   0   0 100   0   0]
+  5000 steps:   38.0%   ± 48.5%
+
+total actions taken: 489
+Efficiency: 61%, 600/(489*2) = 0.6134969325153374
+Manual count of unstacking trial success: 92/100 = 92%
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------
+Ravens Task Results 2020-03-05 1 am
+
+Note: Need to set stand and block physics params to be realistic values in the urdf files located in ravens/assets/stacking:
+lateral friction: 0.5
+rolling friction: 0.001
+intertia scaling: 2.0
+translation epsilon: 1.0 cm (except unstacking, where it is 5.0 cm)
+rotation epsilon: 180 degrees
+
+
+action counts: [12, 12, 5, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 7, 12, 12, 12, 12, 12, 12, 5, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 5, 12, 5, 5, 12]
+total actions taken: 560
+recoveries: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+avg recoveries: 0.12
+total_rewards: 0.5
+avg_total_rewards: 0.5
+successes: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+avg successes: 0.12
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-05 00:28:20.789000: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-tower-transporter-2-
+filename: stack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [  0   0 100   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0 100   0   0   0   0   0   0 100   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0 100   0 100 100   0]
+  5000 steps:	12.0%	± 32.5%
+filename: unstack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [100   0 100   0 100   0   0   0   0   0   0 100 100   0   0 100   0   0
+ 100   0   0   0   0 100   0   0 100   0   0   0   0   0 100 100 100   0
+   0   0   0 100 100 100   0   0   0   0 100 100 100 100   0   0 100 100
+ 100   0 100 100   0   0   0   0 100 100   0 100   0   0 100   0 100   0
+ 100 100 100   0   0   0   0 100 100 100   0   0   0   0   0 100   0   0
+   0   0   0 100   0   0   0 100   0   0]
+  5000 steps:	38.0%	± 48.5%
+count: 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+action counts: [12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 6, 12, 12, 12, 12, 12]
+total actions taken: 594
+recoveries: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+avg recoveries: 0.02
+total_rewards: 0
+avg_total_rewards: 0
+successes: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+avg successes: 0.02
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-05 00:38:17.501014: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+block-row-transporter-2-
+filename: block-row-transporter-2-0-5000.pkl rewards after locking to 100%: [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0 100   0   0   0   0   0]
+  5000 steps:	2.0%	± 14.0%
+
+
+
+
+
+
+
+
+
+
+
+action counts: [4, 12, 12, 12, 12, 4, 12, 12, 12, 5, 5, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 4, 12, 4, 12, 12, 12, 5, 12, 12, 12, 4, 4, 12, 12, 12, 12, 5, 12, 12, 12, 12]
+total actions taken: 524
+recoveries: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+avg recoveries: 0.09090909090909091
+total_rewards: 0
+avg_total_rewards: 0
+successes: [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+avg successes: 0.2
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-05 00:47:32.683937: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-vertical-square-transporter-2-
+filename: stack-block-vertical-square-transporter-2-0-5000.pkl rewards after locking to 100%: [100   0   0   0   0 100   0   0   0 100 100   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0 100   0 100   0   0   0 100
+   0   0   0 100 100   0   0   0   0 100   0   0   0   0]
+  5000 steps:	20.0%	± 40.0%
+count: 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+action counts: [12, 12, 5, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 7, 12, 12, 12, 12, 12, 12, 5, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 5, 12, 5, 5, 12]
+total actions taken: 560
+recoveries: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+avg recoveries: 0.12
+total_rewards: 0.5
+avg_total_rewards: 0.5
+successes: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+avg successes: 0.12
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-05 00:28:20.789000: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-tower-transporter-2-
+filename: stack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [  0   0 100   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0 100   0   0   0   0   0   0 100   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0 100   0 100 100   0]
+  5000 steps:	12.0%	± 32.5%
+filename: unstack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [100   0 100   0 100   0   0   0   0   0   0 100 100   0   0 100   0   0
+ 100   0   0   0   0 100   0   0 100   0   0   0   0   0 100 100 100   0
+   0   0   0 100 100 100   0   0   0   0 100 100 100 100   0   0 100 100
+ 100   0 100 100   0   0   0   0 100 100   0 100   0   0 100   0 100   0
+ 100 100 100   0   0   0   0 100 100 100   0   0   0   0   0 100   0   0
+   0   0   0 100   0   0   0 100   0   0]
+  5000 steps:	38.0%	± 48.5%
+count: 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+action counts: [3, 6, 3, 6, 3, 6, 6, 6, 6, 6, 6, 3, 3, 6, 6, 3, 6, 4, 3, 6, 6, 6, 6, 3, 6, 6, 3, 6, 6, 6, 6, 6, 3, 3, 3, 6, 6, 6, 6, 5, 3, 3, 6, 6, 6, 6, 3, 3, 3, 3]
+total actions taken: 243
+recoveries: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+avg recoveries: 0.03125
+total_rewards: 1.0
+avg_total_rewards: 1.0
+successes: [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
+avg successes: 0.38
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-05 00:53:09.880230: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+unstack-block-tower-transporter-2-
+filename: unstack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [100   0 100   0 100   0   0   0   0   0   0 100 100   0   0 100   0   0
+ 100   0   0   0   0 100   0   0 100   0   0   0   0   0 100 100 100   0
+   0   0   0 100 100 100   0   0   0   0 100 100 100 100]
+  5000 steps:	38.0%	± 48.5%
+count: 0
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: unstack-block-tower-transporter-2--plot.png
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+================================================================
+
+
+
+
+
+block tower 50:
+
+Test: 50/100
+total actions taken: 560
+recoveries: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+avg recoveries: 0.12
+total_rewards: 0.5
+avg_total_rewards: 0.5
+successes: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+avg successes: 0.12
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-05 09:41:11.869840: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-tower-transporter-2-
+filename: stack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [  0   0 100   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0 100   0   0   0   0   0   0 100   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0 100   0 100 100   0]
+  5000 steps:	12.0%	± 32.5%
+filename: unstack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [100   0 100   0 100   0   0   0   0   0   0 100 100   0   0 100   0   0
+ 100   0   0   0   0 100   0   0 100   0   0   0   0   0 100 100 100   0
+   0   0   0 100 100 100   0   0   0   0 100 100 100 100]
+  5000 steps:	38.0%	± 48.5%
+count: 0
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: stack-block-tower-transporter-2--plot.png
+
+
+
+
+
+
+
+
+row 50:
+Test: 50/100
+total actions taken: 594
+recoveries: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+avg recoveries: 0.02
+total_rewards: 0
+avg_total_rewards: 0
+successes: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+avg successes: 0.02
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-05 10:01:36.083416: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+block-row-transporter-2-
+filename: block-row-transporter-2-0-5000.pkl rewards after locking to 100%: [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0 100   0   0   0   0   0]
+  5000 steps:	2.0%	± 14.0%
+count: 0
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: block-row-transporter-2--plot.png
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+vertical square 50:
+Test: 50/100
+total actions taken: 524
+recoveries: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+avg recoveries: 0.09090909090909091
+total_rewards: 0
+avg_total_rewards: 0
+successes: [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+avg successes: 0.2
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-05 10:20:20.766784: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-vertical-square-transporter-2-
+filename: stack-block-vertical-square-transporter-2-0-5000.pkl rewards after locking to 100%: [100   0   0   0   0 100   0   0   0 100 100   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0 100   0 100   0   0   0 100
+   0   0   0 100 100   0   0   0   0 100   0   0   0   0]
+  5000 steps:	20.0%	± 40.0%
+count: 0
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: stack-block-vertical-square-transporter-2--plot.png
+pybullet build time: Nov 26 2020 23:07:47
+
+
+
+
+
+unstack:
+
+total actions taken: 240
+recoveries: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+avg recoveries: 0.03225806451612903
+total_rewards: 1.0
+avg_total_rewards: 1.0
+successes: [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0]
+avg successes: 0.4
+numActiveThreads = 0
+stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+finished
+numActiveThreads = 0
+btShutDownExampleBrowser stopping threads
+Thread with taskId 0 exiting
+Thread TERMINATED
+destroy semaphore
+semaphore destroyed
+destroy main semaphore
+main semaphore destroyed
+pybullet build time: Nov 26 2020 23:07:47
+2021-03-05 10:30:12.377087: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+unstack-block-tower-transporter-2-
+filename: unstack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [100   0 100   0 100   0   0   0   0   0   0 100 100   0   0 100   0   0
+ 100 100   0   0   0 100   0   0 100   0   0   0   0   0 100 100 100   0
+   0   0   0 100 100 100   0   0   0   0 100 100 100 100]
+  5000 steps:	40.0%	± 49.0%
+count: 0
+/home/costar/src/google-research/ravens/ravens/ut
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+===========================================================
+transporternets ravens results 2021-03-05-1446
+
+Note: Need to set stand and block physics params to be realistic values in the urdf files located in ravens/assets/stacking:
+lateral friction: 0.5
+rolling friction: 0.001
+intertia scaling: 2.0
+translation epsilon: 1.0 cm (except unstacking, where it is 5.0 cm)
+rotation epsilon: 180 degrees
+
+transporternets stack:
+Test: 50/100
+total actions taken: 560
+recoveries: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+avg recoveries: 0.12
+total_rewards: [0.25, 0.5, 1.0, 0.5, 0, 0.75, 0, 0.75, 0, 0, 0.25, 0.75, 0.25, 0.75, 0, 0.75, 0.75, 0.5, 0, 0.5, 1.0, 0.5, 0, 0.5, 0.75, 0.75, 0.5, 1.0, 0.5, 0.75, 0.75, 0.75, 0.75, 0, 0.5, 0.25, 0.5, 0, 0.25, 0.5, 0.75, 0.5, 0.25, 0.75, 0.75, 1.0, 0.25, 1.0, 1.0, 0.5]
+avg_total_rewards: 0.51
+successes: [0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0]
+avg successes: 0.12
+2021-03-05 11:40:04.528926: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-tower-transporter-2-
+filename: stack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [  0   0 100   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0 100   0   0   0   0   0   0 100   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0 100   0 100 100   0]
+  5000 steps:	12.0%	± 32.5%
+count: 0
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+
+
+
+
+transporternets row:
+Test: 50/100
+total actions taken: 594
+recoveries: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+avg recoveries: 0.02
+total_rewards: [0.75, 0, 0.75, 0, 0, 0.75, 0.5, 0, 0, 0.75, 0.25, 0.75, 0, 0.75, 0.25, 0, 0, 0.25, 0.25, 0, 0, 0.25, 0.5, 0, 0, 0.75, 0, 0, 0, 0, 0, 0.75, 0, 0, 0, 0.5, 0.25, 0, 0.5, 0.5, 0, 0, 0, 0, 1.0, 0, 0, 0.75, 0, 0]
+avg_total_rewards: 0.235
+successes: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+avg successes: 0.02
+2021-03-05 12:00:39.997681: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+block-row-transporter-2-
+filename: block-row-transporter-2-0-5000.pkl rewards after locking to 100%: [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0 100   0   0   0   0   0]
+  5000 steps:	2.0%	± 14.0%
+count: 0
+
+
+transporternets vertical square:
+Test: 50/100
+total actions taken: 524
+recoveries: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+avg recoveries: 0.09090909090909091
+total_rewards: [1.0, 0, 0.5, 0, 0, 1.0, 0.25, 0, 0.75, 1.0, 1.0, 0.25, 0, 0.25, 0.25, 0, 0.25, 0.5, 0.5, 0, 0, 0, 0.25, 0, 0, 0.5, 0, 0, 0, 1.0, 0.25, 1.0, 0, 0, 0, 1.0, 0.25, 0, 0.75, 1.0, 1.0, 0, 0, 0, 0.25, 1.0, 0, 0.25, 0, 0]
+avg_total_rewards: 0.32
+successes: [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0]
+avg successes: 0.2
+2021-03-05 12:19:02.412588: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+stack-block-vertical-square-transporter-2-
+filename: stack-block-vertical-square-transporter-2-0-5000.pkl rewards after locking to 100%: [100   0   0   0   0 100   0   0   0 100 100   0   0   0   0   0   0   0
+   0   0   0   0   0   0   0   0   0   0   0 100   0 100   0   0   0 100
+   0   0   0 100 100   0   0   0   0 100   0   0   0   0]
+  5000 steps:	20.0%	± 40.0%
+count: 0
+
+
+
+transporternets unstack (run with human input for scoring):
+Test: 50/100
+total actions taken: 240
+recoveries: [1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0]
+avg recoveries: 0.7741935483870968
+total_rewards: [1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 0.75, 1.0, 1.0, 0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+avg_total_rewards: 0.945
+successes: [1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+avg successes: 0.86
+
+2021-03-05 14:34:39.486998: I tensorflow/stream_executor/platform/default/dso_loader.cc:48] Successfully opened dynamic library libcudart.so.10.1
+unstack-block-tower-transporter-2-
+filename: unstack-block-tower-transporter-2-0-5000.pkl rewards after locking to 100%: [100 100 100 100 100   0 100   0 100 100 100 100 100 100 100 100   0 100
+ 100 100 100 100   0 100 100 100 100   0 100 100   0 100 100 100 100 100
+ 100 100 100 100 100 100   0 100 100 100 100 100 100 100]
+  5000 steps:	86.0%	± 34.7%
+count: 0
+/home/costar/src/google-research/ravens/ravens/utils.py:521: UserWarning: Attempting to set identical left == right == 5000.0 results in singular transformations; automatically expanding.
+  plt.xlim(xlim)
+Done. Plot image saved to: unstack-block-tower-transporter-2--plot.png

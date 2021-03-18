@@ -1,4 +1,4 @@
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,10 +20,8 @@ set -x
 
 virtualenv -p python3.6 .venv_gfsa
 source .venv_gfsa/bin/activate
+pip install --upgrade pip
 pip install -r gfsa/requirements.txt
 
 # Run unit tests.
 find gfsa -name "*_test.py" | xargs python -m unittest
-
-# TODO(ddjohnson): Add simple training jobs with small models to ensure that we
-# can train successfully, once training data is available on GCS.

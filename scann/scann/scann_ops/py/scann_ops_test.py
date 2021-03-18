@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -167,7 +167,7 @@ class TestEagerMode(tf.test.TestCase):
 
     idx, dis = searcher.search_batched(queries)
     idx_parallel, dis_parallel = searcher.search_batched_parallel(queries)
-    self.assertAllEqual(dis, dis_parallel)
+    self.assertAllClose(dis, dis_parallel)
     self.assertAllEqual(idx, idx_parallel)
 
   def test_reordering_shapes(self):

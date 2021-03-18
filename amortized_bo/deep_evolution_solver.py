@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -462,7 +462,7 @@ class JaxMutationPredictor(object):
         learning_rate)
 
     self.loss_fn = functools.partial(loss_fn, run_model_fn=self.run_model)
-    self.loss_grad_fn = jax.jit(jax.grad(self.loss_fn))
+    self.loss_grad_fn = jax.grad(self.loss_fn)
 
     # Track steps of optimization so far.
     self._step_idx = 0

@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 
 
-#ifndef SCANN__UTILS_WEAK_PTR_CACHE_H_
-#define SCANN__UTILS_WEAK_PTR_CACHE_H_
+#ifndef SCANN_UTILS_WEAK_PTR_CACHE_H_
+#define SCANN_UTILS_WEAK_PTR_CACHE_H_
 
 #include <functional>
 
@@ -24,8 +24,7 @@
 #include "absl/synchronization/mutex.h"
 #include "scann/utils/types.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 template <typename Output, typename... Inputs>
 StatusOr<shared_ptr<const Output>> WeakPtrCache(
@@ -55,7 +54,6 @@ StatusOr<shared_ptr<const Output>> WeakPtrCache(
   return create_new_output();
 }
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

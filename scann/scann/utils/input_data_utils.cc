@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 
 #include "scann/proto/projection.pb.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 StatusOr<DatapointIndex> ComputeConsistentNumPointsFromIndex(
     const Dataset* dataset, const DenseDataset<uint8_t>* hashed_dataset,
@@ -129,5 +128,4 @@ StatusOr<DimensionIndex> ComputeConsistentDimensionalityFromIndex(
   return dims;
 }
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

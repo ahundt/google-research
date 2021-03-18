@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 
 
 
-#ifndef SCANN__DATA_FORMAT_GFV_CONVERSION_H_
-#define SCANN__DATA_FORMAT_GFV_CONVERSION_H_
+#ifndef SCANN_DATA_FORMAT_GFV_CONVERSION_H_
+#define SCANN_DATA_FORMAT_GFV_CONVERSION_H_
 
 #include <limits>
 #include <type_traits>
@@ -24,8 +24,7 @@
 #include "scann/data_format/gfv_properties.h"
 #include "scann/utils/types.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 template <typename VecT>
 Status GfvValuesToVector(const GenericFeatureVector& gfv, VecT* result);
@@ -192,7 +191,6 @@ inline void UnpackBinaryToInt64<double>(ConstSpan<double> packed,
   LOG(FATAL) << "Cannot treat double arrays as bit-packed binary data.";
 }
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

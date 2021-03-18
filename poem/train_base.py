@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import tensorflow.compat.v1 as tf
 import tf_slim
 
 from poem.core import data_utils
+from poem.core import distance_utils
 from poem.core import keypoint_utils
 from poem.core import loss_utils
-from poem.core import models
 from poem.core import pipeline_utils
 
 FLAGS = flags.FLAGS
@@ -66,6 +66,9 @@ flags.DEFINE_integer(
 flags.DEFINE_integer('num_embedding_samples', 20,
                      'Number of samples from embedding distributions.')
 
+# See `common_module.SUPPORTED_BASE_MODEL_TYPES`.
+flags.DEFINE_string('base_model_type', 'SIMPLE', 'Type of base model.')
+
 flags.DEFINE_integer('num_fc_blocks', 2, 'Number of fully connected blocks.')
 
 flags.DEFINE_integer('num_fcs_per_block', 2,
@@ -94,7 +97,8 @@ flags.DEFINE_string(
 flags.DEFINE_float(
     'min_negative_keypoint_mpjpe', 0.1,
     'Minimum MPJPE gap for two poses to be considered as negative match. Only'
-    ' used if `keypoint_distance_type` is `MPJPE`.')
+    ' used if `keypoint_distance_type` is `MPJPE`. If negative, uses all other '
+    'samples as negative matches.')
 
 # See `common_module.SUPPORTED_DISTANCE_TYPES`.
 flags.DEFINE_string('triplet_distance_type', 'SAMPLE',
@@ -214,6 +218,23 @@ flags.DEFINE_integer(
     'input_shuffle_buffer_size', 2097152,
     'Input shuffle buffer size. A large number beneifts shuffling quality.')
 
+flags.DEFINE_float(
+    'sigmoid_raw_a_initial', -0.65,
+    'Initial value of sigmoid `raw_a` parameter. We initialize the sigmoid '
+    'parameters to a constant to avoid model being stuck in a `dead zone` at '
+    'the beginning of training. The actual value of `a` will be ELU(raw_a) + '
+    '1.')
+
+flags.DEFINE_float(
+    'sigmoid_b_initial', -0.5,
+    'Initial value of sigmoid `b` parameter. We initialize the sigmoid '
+    'parameters to a constant to avoid model being stuck in a `dead zone` at '
+    'the beginning of training.')
+
+flags.DEFINE_float(
+    'sigmoid_a_max', -1.0,
+    'Maximum value of sigmoid `a` parameter. Ignored if None or non-positive.')
+
 flags.DEFINE_list(
     'random_projection_azimuth_range', ['-180.0', '180.0'],
     'CSV of 2-tuple rotation angle limit (lower_limit, upper_limit) for '
@@ -269,8 +290,8 @@ flags.DEFINE_integer(
 flags.DEFINE_integer('task', 0, 'Task replica identifier for training.')
 
 
-def _validate_and_setup(common_module, keypoint_profiles_module,
-                        keypoint_distance_config_override):
+def _validate_and_setup(common_module, keypoint_profiles_module, models_module,
+                        keypoint_distance_config_override, embedder_fn_kwargs):
   """Validates and sets up training configurations."""
   # Set default values for unspecified flags.
   if FLAGS.use_normalized_embeddings_for_triplet_mining is None:
@@ -295,6 +316,7 @@ def _validate_and_setup(common_module, keypoint_profiles_module,
   validate_flag(FLAGS.model_input_keypoint_type,
                 common_module.SUPPORTED_TRAINING_MODEL_INPUT_KEYPOINT_TYPES)
   validate_flag(FLAGS.embedding_type, common_module.SUPPORTED_EMBEDDING_TYPES)
+  validate_flag(FLAGS.base_model_type, common_module.SUPPORTED_BASE_MODEL_TYPES)
   validate_flag(FLAGS.keypoint_distance_type,
                 common_module.SUPPORTED_KEYPOINT_DISTANCE_TYPES)
   validate_flag(FLAGS.triplet_distance_type,
@@ -359,14 +381,31 @@ def _validate_and_setup(common_module, keypoint_profiles_module,
         'kernel and `NEG_LOG_MEAN` or `LOWER_HALF_NEG_LOG_MEAN` parwise reducer'
         ' in pairs.')
 
+  keypoint_profile_2d = keypoint_profiles_module.create_keypoint_profile_or_die(
+      FLAGS.input_keypoint_profile_name_2d)
+
   # Set up configurations.
   configs = {
       'keypoint_profile_3d':
           keypoint_profiles_module.create_keypoint_profile_or_die(
               FLAGS.input_keypoint_profile_name_3d),
       'keypoint_profile_2d':
-          keypoint_profiles_module.create_keypoint_profile_or_die(
-              FLAGS.input_keypoint_profile_name_2d),
+          keypoint_profile_2d,
+      'embedder_fn':
+          models_module.get_embedder(
+              base_model_type=FLAGS.base_model_type,
+              embedding_type=FLAGS.embedding_type,
+              num_embedding_components=FLAGS.num_embedding_components,
+              embedding_size=FLAGS.embedding_size,
+              num_embedding_samples=FLAGS.num_embedding_samples,
+              is_training=True,
+              num_fc_blocks=FLAGS.num_fc_blocks,
+              num_fcs_per_block=FLAGS.num_fcs_per_block,
+              num_hidden_nodes=FLAGS.num_hidden_nodes,
+              num_bottleneck_nodes=FLAGS.num_bottleneck_nodes,
+              weight_max_norm=FLAGS.weight_max_norm,
+              dropout_rate=FLAGS.dropout_rate,
+              **embedder_fn_kwargs),
       'triplet_embedding_keys':
           pipeline_utils.get_embedding_keys(
               FLAGS.triplet_distance_type, common_module=common_module),
@@ -383,10 +422,11 @@ def _validate_and_setup(common_module, keypoint_profiles_module,
               componentwise_reduction=FLAGS.triplet_componentwise_reduction,
               # We initialize the sigmoid parameters to avoid model being stuck
               # in a `dead zone` at the beginning of training.
-              L2_SIGMOID_MATCHING_PROB_a_initializer=(
-                  tf.initializers.constant(-0.65)),
+              L2_SIGMOID_MATCHING_PROB_raw_a_initializer=(
+                  tf.initializers.constant(FLAGS.sigmoid_raw_a_initial)),
               L2_SIGMOID_MATCHING_PROB_b_initializer=(
-                  tf.initializers.constant(-0.5)),
+                  tf.initializers.constant(FLAGS.sigmoid_b_initial)),
+              L2_SIGMOID_MATCHING_PROB_a_range=(None, FLAGS.sigmoid_a_max),
               EXPECTED_LIKELIHOOD_min_stddev=0.1,
               EXPECTED_LIKELIHOOD_max_squared_mahalanobis_distance=100.0),
       'positive_pairwise_embedding_keys':
@@ -402,10 +442,10 @@ def _validate_and_setup(common_module, keypoint_profiles_module,
                   FLAGS.positive_pairwise_componentwise_reduction),
               # We initialize the sigmoid parameters to avoid model being stuck
               # in a `dead zone` at the beginning of training.
-              L2_SIGMOID_MATCHING_PROB_a_initializer=(
-                  tf.initializers.constant(-0.65)),
+              L2_SIGMOID_MATCHING_PROB_raw_a_initializer=(
+                  tf.initializers.constant(FLAGS.sigmoid_raw_a_initial)),
               L2_SIGMOID_MATCHING_PROB_b_initializer=(
-                  tf.initializers.constant(-0.5)),
+                  tf.initializers.constant(FLAGS.sigmoid_b_initial)),
               EXPECTED_LIKELIHOOD_min_stddev=0.1,
               EXPECTED_LIKELIHOOD_max_squared_mahalanobis_distance=100.0),
       'summarize_matching_sigmoid_vars':
@@ -452,8 +492,9 @@ def _validate_and_setup(common_module, keypoint_profiles_module,
 
 
 def run(master, input_dataset_class, common_module, keypoint_profiles_module,
-        tfe_parser_creator, keypoint_preprocessor_3d, create_model_input_fn,
-        keypoint_distance_config_override):
+        models_module, input_example_parser_creator, keypoint_preprocessor_3d,
+        create_model_input_fn, keypoint_distance_config_override,
+        embedder_fn_kwargs):
   """Runs training pipeline.
 
   Args:
@@ -461,18 +502,23 @@ def run(master, input_dataset_class, common_module, keypoint_profiles_module,
     input_dataset_class: An input dataset class that matches input table type.
     common_module: A Python module that defines common flags and constants.
     keypoint_profiles_module: A Python module that defines keypoint profiles.
-    tfe_parser_creator: A function handle for creating tf.Example parser
+    models_module: A Python module that defines base model architectures.
+    input_example_parser_creator: A function handle for creating data parser
       function. If None, uses the default parser creator.
     keypoint_preprocessor_3d: A function handle for preprocessing raw 3D
       keypoints.
     create_model_input_fn: A function handle for creating model inputs.
     keypoint_distance_config_override: A dictionary for keypoint distance
       configuration to override the defaults. Ignored if empty.
+    embedder_fn_kwargs: A dictionary of additional kwargs for creating the
+      embedder function.
   """
   configs = _validate_and_setup(
       common_module=common_module,
       keypoint_profiles_module=keypoint_profiles_module,
-      keypoint_distance_config_override=keypoint_distance_config_override)
+      models_module=models_module,
+      keypoint_distance_config_override=keypoint_distance_config_override,
+      embedder_fn_kwargs=embedder_fn_kwargs)
 
   g = tf.Graph()
   with g.as_default():
@@ -480,7 +526,7 @@ def run(master, input_dataset_class, common_module, keypoint_profiles_module,
 
       def create_inputs():
         """Creates pipeline and model inputs."""
-        inputs = pipeline_utils.read_batch_from_tfe_tables(
+        inputs = pipeline_utils.read_batch_from_dataset_tables(
             FLAGS.input_table,
             batch_sizes=[int(x) for x in FLAGS.batch_size],
             num_instances_per_record=2,
@@ -492,7 +538,7 @@ def run(master, input_dataset_class, common_module, keypoint_profiles_module,
             shuffle_buffer_size=FLAGS.input_shuffle_buffer_size,
             common_module=common_module,
             dataset_class=input_dataset_class,
-            tfe_parser_creator=tfe_parser_creator)
+            input_example_parser_creator=input_example_parser_creator)
 
         (inputs[common_module.KEY_KEYPOINTS_3D],
          keypoint_preprocessor_side_outputs_3d) = keypoint_preprocessor_3d(
@@ -504,7 +550,7 @@ def run(master, input_dataset_class, common_module, keypoint_profiles_module,
         inputs['model_inputs'], side_inputs = create_model_input_fn(
             inputs[common_module.KEY_KEYPOINTS_2D],
             inputs[common_module.KEY_KEYPOINT_MASKS_2D],
-            inputs[common_module.KEY_KEYPOINTS_3D],
+            inputs[common_module.KEY_PREPROCESSED_KEYPOINTS_3D],
             model_input_keypoint_type=FLAGS.model_input_keypoint_type,
             normalize_keypoints_2d=True,
             keypoint_profile_2d=configs['keypoint_profile_2d'],
@@ -516,19 +562,7 @@ def run(master, input_dataset_class, common_module, keypoint_profiles_module,
         return inputs
 
       inputs = create_inputs()
-      outputs, _ = models.embed(
-          inputs['model_inputs'],
-          embedding_type=FLAGS.embedding_type,
-          num_embedding_components=FLAGS.num_embedding_components,
-          embedding_size=FLAGS.embedding_size,
-          num_embedding_samples=FLAGS.num_embedding_samples,
-          is_training=True,
-          num_fc_blocks=FLAGS.num_fc_blocks,
-          num_fcs_per_block=FLAGS.num_fcs_per_block,
-          num_hidden_nodes=FLAGS.num_hidden_nodes,
-          num_bottleneck_nodes=FLAGS.num_bottleneck_nodes,
-          weight_max_norm=FLAGS.weight_max_norm,
-          dropout_rate=FLAGS.dropout_rate)
+      outputs, _ = configs['embedder_fn'](inputs['model_inputs'])
       summaries = {
           'train/batch_size':
               tf.shape(outputs[common_module.KEY_EMBEDDING_MEANS])[0]
@@ -653,11 +687,18 @@ def run(master, input_dataset_class, common_module, keypoint_profiles_module,
 
       if configs['summarize_matching_sigmoid_vars']:
         # Summarize variables used in matching sigmoid.
-        with tf.variable_scope('MatchingSigmoid', reuse=True):
-          summaries['train/MatchingSigmoid/a'] = tf.get_variable('a')
-          summaries['train/MatchingSigmoid/a_plus'] = (
-              tf.nn.elu(tf.get_variable('a')) + 1.0)
-          summaries['train/MatchingSigmoid/b'] = tf.get_variable('b')
+        raw_a, a, b = distance_utils.get_sigmoid_parameters(
+            name='MatchingSigmoid',
+            reuse=True,
+            a_range=(None, FLAGS.sigmoid_a_max))
+        # TODO(liuti): Currently the variable for `raw_a` is named `a` in
+        # checkpoints, and true `a` may be referred to as `a_plus` for historic
+        # reasons. Consolidate the naming.
+        summaries.update({
+            'train/MatchingSigmoid/a': raw_a,
+            'train/MatchingSigmoid/a_plus': a,
+            'train/MatchingSigmoid/b': b,
+        })
 
       if FLAGS.use_moving_average:
         pipeline_utils.add_moving_average(FLAGS.moving_average_decay)

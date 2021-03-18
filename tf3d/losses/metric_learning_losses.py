@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ def npair_loss_func(embeddings,
   return tf.math.reduce_mean(losses)
 
 
-@gin.configurable('npair_loss', blacklist=['inputs', 'outputs'])
+@gin.configurable('npair_loss', denylist=['inputs', 'outputs'])
 def npair_loss(inputs,
                outputs,
                num_samples,
@@ -152,7 +152,7 @@ def npair_loss(inputs,
 
 
 @gin.configurable(
-    'embedding_regularization_loss', blacklist=['inputs', 'outputs'])
+    'embedding_regularization_loss', denylist=['inputs', 'outputs'])
 def embedding_regularization_loss(inputs,
                                   outputs,
                                   lambda_coef=0.0001,

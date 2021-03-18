@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,7 @@
 #include "scann/utils/datapoint_utils.h"
 #include "tensorflow/core/lib/core/errors.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 template <typename Base, typename T, typename ProjectionType>
 ProjectingDecoratorBase<Base, T, ProjectionType>::ProjectingDecoratorBase(
@@ -146,5 +145,4 @@ INSTANTIATE_PROJECTING_DECORATOR(uint64_t);
 INSTANTIATE_PROJECTING_DECORATOR(float);
 INSTANTIATE_PROJECTING_DECORATOR(double);
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

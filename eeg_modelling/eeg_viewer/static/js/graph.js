@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -366,7 +366,9 @@ class Graph extends ChartBase {
           // The formatted value on each cell holds the actual voltage value.
           // The value holds the value with the transformation applied.
           dataTable.setValue(row, col, transformedValue);
-          dataTable.setFormattedValue(row, col, value);
+          // TODO(b/161803357): Remove cast to unknown type. Found number,
+          // required string.
+          dataTable.setFormattedValue(row, col, /** @type {?} */ (value));
         }
       }
     }

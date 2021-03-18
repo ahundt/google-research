@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ def prepare_datasets(dataset_name=gin.REQUIRED,
   return datasets, emb_matrices
 
 
-@gin.configurable(blacklist=['save_dir'])
+@gin.configurable(denylist=['save_dir'])
 def train(save_dir, num_epochs=300,
           learning_rate=0.0001, save_every_n_epochs=25):
   """Train pipeline for next sentence embedding prediction on ROCStories."""

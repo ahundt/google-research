@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
 """Tests for non_semantic_speech_benchmark.distillation.models."""
 
 from absl.testing import absltest
+from absl.testing import parameterized
 
 import tensorflow as tf
 
 from non_semantic_speech_benchmark.distillation import models
+from non_semantic_speech_benchmark.distillation.compression_lib import compression_op as compression
+from non_semantic_speech_benchmark.distillation.compression_lib import compression_wrapper
 
 
-class ModelsTest(absltest.TestCase):
+class ModelsTest(parameterized.TestCase):
 
   def test_model_frontend(self):
     input_tensor = tf.zeros([2, 32000], dtype=tf.float32)  # audio signal
@@ -48,18 +51,52 @@ class ModelsTest(absltest.TestCase):
 
   def test_invalid_mobilenet_size(self):
     invalid_mobilenet_size = 'huuuge'
-    with self.assertRaises(AssertionError) as exception_context:
+    with self.assertRaises(ValueError) as exception_context:
       models.get_keras_model(3, 5, mobilenet_size=invalid_mobilenet_size)
-    if not isinstance(exception_context.exception, AssertionError):
+    if not isinstance(exception_context.exception, ValueError):
       self.fail()
 
-  def test_valid_mobilenet_size(self):
+  @parameterized.parameters(
+      {'mobilenet_size': 'tiny'},
+      {'mobilenet_size': 'small'},
+      {'mobilenet_size': 'large'},
+      {'mobilenet_size': 'tiny'},
+  )
+  def test_valid_mobilenet_size(self, mobilenet_size):
     input_tensor = tf.zeros([2, 32000], dtype=tf.float32)
-    for mobilenet_size in ('tiny', 'small', 'large'):
-      m = models.get_keras_model(3, 5, mobilenet_size=mobilenet_size)
-      o = m(input_tensor)
-      o.shape.assert_has_rank(2)
-      self.assertEqual(o.shape[1], 5)
+    m = models.get_keras_model(3, 5, mobilenet_size=mobilenet_size)
+    o = m(input_tensor)
+    o.shape.assert_has_rank(2)
+    self.assertEqual(o.shape[1], 5)
+
+  @parameterized.parameters({'add_compression': True},
+                            {'add_compression': False})
+  def test_tflite_model(self, add_compression):
+    compressor = None
+    bottleneck_dimension = 3
+    if add_compression:
+      compression_params = compression.CompressionOp\
+        .get_default_hparams().parse('')
+      compressor = compression_wrapper.get_apply_compression(
+          compression_params, global_step=0)
+    m = models.get_keras_model(
+        bottleneck_dimension,
+        5,
+        frontend=False,
+        mobilenet_size='small',
+        compressor=compressor,
+        tflite=True)
+
+    input_tensor = tf.zeros([1, 96, 64, 1], dtype=tf.float32)
+    o = m(input_tensor)
+    o.shape.assert_has_rank(2)
+    self.assertEqual(o.shape[0], 1)
+    self.assertEqual(o.shape[1], bottleneck_dimension)
+
+    if add_compression:
+      self.assertIsNone(m.get_layer('distilled_output').kernel)
+      self.assertIsNone(
+          m.get_layer('distilled_output').compression_op.a_matrix_tfvar)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -223,6 +223,10 @@ def main(_):
         if strides[0] > 1:
           model_is_streamable = False
           break
+
+    # set input data shape for testing inference in streaming mode
+    flags.data_shape = modes.get_input_data_shape(
+        flags, modes.Modes.STREAM_EXTERNAL_STATE_INFERENCE)
 
     # if model can be streamed, then run conversion/evaluation in streaming mode
     if model_is_streamable:

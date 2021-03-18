@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ def classification_loss_fn(logits,
   return tf.reduce_mean(losses * tf.reshape(weights, [-1]))
 
 
-@gin.configurable('classification_loss', blacklist=['inputs', 'outputs'])
+@gin.configurable('classification_loss', denylist=['inputs', 'outputs'])
 def classification_loss(inputs, outputs):
   """Applies categorical crossentropy loss to voxel predictions.
 
@@ -467,7 +467,7 @@ def classification_loss_using_mask_iou_func(embeddings,
 
 
 @gin.configurable(
-    'classification_loss_using_mask_iou', blacklist=['inputs', 'outputs'])
+    'classification_loss_using_mask_iou', denylist=['inputs', 'outputs'])
 def classification_loss_using_mask_iou(inputs,
                                        outputs,
                                        num_samples,

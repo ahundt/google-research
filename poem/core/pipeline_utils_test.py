@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@ FLAGS = flags.FLAGS
 
 class PipelineUtilsTest(tf.test.TestCase):
 
-  def test_read_batch_from_tfe_tables(self):
+  def test_read_batch_from_dataset_tables(self):
     testdata_dir = 'poem/testdata'  # Assumes $PWD == "google_research/".
     table_path = os.path.join(FLAGS.test_srcdir, testdata_dir,
                               'tfe-2.tfrecords')
-    inputs = pipeline_utils.read_batch_from_tfe_tables(
+    inputs = pipeline_utils.read_batch_from_dataset_tables(
         [table_path, table_path],
         batch_sizes=[4, 2],
         num_instances_per_record=2,
@@ -59,7 +59,12 @@ class PipelineUtilsTest(tf.test.TestCase):
   def test_add_moving_average(self):
     inputs = tf.zeros([4, 2, 3])
     output_sizes = {'a': 8, 'b': 4}
-    models.simple_model(inputs, output_sizes, is_training=True, name='M')
+    models.simple_model(
+        inputs,
+        output_sizes,
+        sequential_inputs=False,
+        is_training=True,
+        name='M')
     pipeline_utils.add_moving_average(decay=0.9999)
 
     expected_global_variable_shapes = {
@@ -146,7 +151,12 @@ class PipelineUtilsTest(tf.test.TestCase):
   def test_get_moving_average_variables_to_restore(self):
     inputs = tf.zeros([4, 2, 3])
     output_sizes = {'a': 8, 'b': 4}
-    models.simple_model(inputs, output_sizes, is_training=False, name='M')
+    models.simple_model(
+        inputs,
+        output_sizes,
+        sequential_inputs=False,
+        is_training=False,
+        name='M')
     variables_to_restore = (
         pipeline_utils.get_moving_average_variables_to_restore())
 

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ from social_rl.gym_multigrid.register import register
 class DoorKeyEnv(multigrid.MultiGridEnv):
   """Environment with a door and key, sparse reward."""
 
-  def __init__(self, size=8, n_agents=2):
+  def __init__(self, size=8, n_agents=3):
     super().__init__(
         grid_size=size, max_steps=10 * size * size, n_agents=n_agents)
 

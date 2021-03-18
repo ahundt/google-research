@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ class InstanceSegmentationMetric(base_ap_metric.BaseAPMetric):
       tp_c = tf.zeros([num_detections_c], dtype=tf.int32)
       if num_gt_c > 0:
         ious_c = instance_segmentation_utils.points_mask_iou(
-            masks1=det_instance_mask_c, masks2=gt_instance_masks_c)
+            masks1=gt_instance_masks_c, masks2=det_instance_mask_c)
         max_overlap_gt_ids = tf.cast(
             tf.math.argmax(ious_c, axis=0), dtype=tf.int32)
         is_gt_box_detected = tf.zeros([num_gt_c], dtype=tf.int32)

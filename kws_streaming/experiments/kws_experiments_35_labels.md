@@ -25,7 +25,7 @@ mv google-research/kws_streaming .
 
 ## Install tensorflow with deps.
 ```shell
-# set up virtual env
+# set up virtual env with python3
 pip install virtualenv
 virtualenv --system-site-packages -p python3 ./venv3
 source ./venv3/bin/activate
@@ -51,8 +51,9 @@ We divided data into training validation and testing data using all 35 categorie
 
 ```shell
 # download and set up path to custom split of data set V2
-wget https://storage.googleapis.com/kws_models/data_all_v2.zip
-unzip ./data_all_v2.zip
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies 'https://docs.google.com/uc?export=download&id=1OAN3h4uffi5HS7eb7goklWeI2XPm1jCS' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1OAN3h4uffi5HS7eb7goklWeI2XPm1jCS" -O data_all_v2.zip && rm -rf /tmp/cookies.txt
+
+unzip ./data_all_v2.zip -d ./data_all_v2
 
 # path to data sets V2
 DATA_PATH=$KWS_PATH/data_all_v2
@@ -79,7 +80,7 @@ After all of these, main folder KWS_PATH should have several subfolders:
     _background_noise_/
     bed/
     ...
-  models2_75k/
+  models_data_v2_35_labels/
     ...
 </code></pre>
 
@@ -106,7 +107,7 @@ $CMD_TRAIN \
 --data_url '' \
 --data_dir $DATA_PATH/ \
 --train_dir $MODELS_PATH/ds_tc_resnet/ \
---mel_upper_edge_hertz 7000 \
+--mel_upper_edge_hertz 7600 \
 --how_many_training_steps 20000,20000,20000,20000,20000,20000 \
 --learning_rate 0.01,0.005,0.002,0.001,0.0005,0.0002 \
 --window_size_ms 30.0 \
@@ -134,9 +135,10 @@ ds_tc_resnet \
 --ds_dilation '1, 1, 1, 1, 2, 1'
 ```
 
-### based on [MatchboxNet](https://arxiv.org/pdf/2004.08531.pdf)
-parameters: 75K \
-accuracy 96.9
+
+### att_mh_rnn
+parameters: 750K \
+float accuracy 97.2 \
 ```shell
 $CMD_TRAIN \
 --batch_size 128 \
@@ -144,8 +146,8 @@ $CMD_TRAIN \
 --wanted_words 'visual,wow,learn,backward,dog,two,left,happy,nine,go,up,bed,stop,one,zero,tree,seven,on,four,bird,right,eight,no,six,forward,house,marvin,sheila,five,off,three,down,cat,follow,yes' \
 --data_url '' \
 --data_dir $DATA_PATH/ \
---train_dir $MODELS_PATH/ds_tc_resnet_01/ \
---mel_upper_edge_hertz 7000 \
+--train_dir $MODELS_PATH/att_mh_rnn/ \
+--mel_upper_edge_hertz 7600 \
 --how_many_training_steps 40000,40000,20000,20000 \
 --learning_rate 0.001,0.0005,0.0002,0.0001 \
 --window_size_ms 30.0 \
@@ -162,13 +164,17 @@ $CMD_TRAIN \
 --frequency_mask_max_size 7 \
 --pick_deterministically 1 \
 --eval_step_interval 662 \
-ds_tc_resnet \
---activation 'relu' \
---dropout 0.0 \
---ds_filters '128, 64, 64, 64, 128, 128' \
---ds_repeat '1, 1, 1, 1, 1, 1' \
---ds_residual '0, 1, 1, 1, 0, 0' \
---ds_kernel_size '11, 13, 15, 17, 29, 1' \
---ds_stride '1, 1, 1, 1, 1, 1' \
---ds_dilation '1, 1, 1, 1, 2, 1'
+att_mh_rnn \
+--cnn_filters '10,1' \
+--cnn_kernel_size '(5,1),(5,1)' \
+--cnn_act "'relu','relu'" \
+--cnn_dilation_rate '(1,1),(1,1)' \
+--cnn_strides '(1,1),(1,1)' \
+--rnn_layers 2 \
+--rnn_type 'gru' \
+--rnn_units 128 \
+--heads 4 \
+--dropout1 0.2 \
+--units2 '64' \
+--act2 "'relu'"
 ```

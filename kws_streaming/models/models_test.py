@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 # limitations under the License.
 
 """Tests for models."""
+from absl.testing import parameterized
 import numpy as np
 from kws_streaming.layers import test_utils
 from kws_streaming.layers.compat import tf
@@ -27,11 +28,10 @@ from kws_streaming.train import test
 tf1.disable_eager_execution()
 
 
-class DsTcResnetTest(tf.test.TestCase):
+class DsTcResnetTest(tf.test.TestCase, parameterized.TestCase):
   """Test ds_tc_resnet model in non streaming and streaming modes."""
 
-  def setUp(self):
-    super(DsTcResnetTest, self).setUp()
+  def init_model(self, use_tf_fft=False):
 
     config = tf1.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -43,19 +43,23 @@ class DsTcResnetTest(tf.test.TestCase):
     # model parameters
     model_name = 'ds_tc_resnet'
     self.params = model_params.HOTWORD_MODEL_PARAMS[model_name]
+    self.params.causal_data_frame_padding = 1  # causal padding on DataFrame
     self.params.clip_duration_ms = 160
-    self.params.window_size_ms = 4.0
+    self.params.use_tf_fft = use_tf_fft
+    self.params.mel_non_zero_only = not use_tf_fft
+    self.params.feature_type = 'mfcc_tf'
+    self.params.window_size_ms = 5.0
     self.params.window_stride_ms = 2.0
     self.params.wanted_words = 'a,b,c'
-    self.params.ds_padding = "'causal','causal','causal'"
-    self.params.ds_filters = '8,8,4'
-    self.params.ds_repeat = '1,1,1'
-    self.params.ds_residual = '0,1,1'  # residual can not be applied with stride
-    self.params.ds_kernel_size = '3,3,3'
-    self.params.ds_stride = '2,1,1'  # streaming conv with stride
-    self.params.ds_dilation = '1,1,1'
-    self.params.ds_pool = '1,2,1'  # streaming conv with pool
-    self.params.ds_filter_separable = '1,1,1'
+    self.params.ds_padding = "'causal','causal','causal','causal'"
+    self.params.ds_filters = '4,4,4,2'
+    self.params.ds_repeat = '1,1,1,1'
+    self.params.ds_residual = '0,1,1,1'  # no residuals on strided layers
+    self.params.ds_kernel_size = '3,3,3,1'
+    self.params.ds_dilation = '1,1,1,1'
+    self.params.ds_stride = '2,1,1,1'  # streaming conv with stride
+    self.params.ds_pool = '1,2,1,1'  # streaming conv with pool
+    self.params.ds_filter_separable = '1,1,1,1'
 
     # convert ms to samples and compute labels count
     self.params = model_flags.update_flags(self.params)
@@ -74,7 +78,7 @@ class DsTcResnetTest(tf.test.TestCase):
 
     # overide input data shape for streaming model with stride/pool
     self.params.data_stride = total_stride
-    self.params.data_frame_padding = 'causal'
+    self.params.data_shape = (total_stride * self.params.window_stride_samples,)
 
     # set desired number of frames in model
     frames_number = 16
@@ -101,6 +105,7 @@ class DsTcResnetTest(tf.test.TestCase):
     self.non_stream_out = self.model.predict(self.input_data)
 
   def test_ds_tc_resnet_stream(self):
+    self.init_model()
 
     # prepare tf streaming model
     model_stream = utils.to_streaming_inference(
@@ -112,8 +117,9 @@ class DsTcResnetTest(tf.test.TestCase):
         self.params, model_stream, self.input_data)
     self.assertAllClose(stream_out, self.non_stream_out, atol=1e-5)
 
-  def test_ds_tc_resnet_stream_tflite(self):
-
+  @parameterized.parameters(False, True)
+  def test_ds_tc_resnet_stream_tflite(self, use_tf_fft):
+    self.init_model(use_tf_fft)
     tflite_streaming_model = utils.model_to_tflite(
         self.sess, self.model, self.params,
         Modes.STREAM_EXTERNAL_STATE_INFERENCE)

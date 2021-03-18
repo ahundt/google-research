@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCANN__DISTANCE_MEASURES_ONE_TO_ONE_NONZERO_INTERSECT_DISTANCE_H_
-#define SCANN__DISTANCE_MEASURES_ONE_TO_ONE_NONZERO_INTERSECT_DISTANCE_H_
+#ifndef SCANN_DISTANCE_MEASURES_ONE_TO_ONE_NONZERO_INTERSECT_DISTANCE_H_
+#define SCANN_DISTANCE_MEASURES_ONE_TO_ONE_NONZERO_INTERSECT_DISTANCE_H_
 
 #include "scann/data_format/datapoint.h"
 #include "scann/distance_measures/distance_measure_base.h"
@@ -22,8 +22,7 @@
 #include "scann/utils/reduction.h"
 #include "tensorflow/core/platform/logging.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 class NonzeroIntersectDistance final : public DistanceMeasure {
  public:
@@ -69,7 +68,6 @@ class NonzeroIntersectDistance final : public DistanceMeasure {
   }
 };
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

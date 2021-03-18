@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
 
 
 #include "scann/data_format/docid_collection.h"
+
 #include "absl/time/clock.h"
 #include "absl/time/time.h"
 #include "scann/oss_wrappers/scann_down_cast.h"
 #include "scann/utils/memory_logging.h"
 #include "scann/utils/types.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 namespace {
 
@@ -646,5 +646,4 @@ Status FixedLengthDocidCollection::Mutator::RemoveDatapoint(
   return OkStatus();
 }
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

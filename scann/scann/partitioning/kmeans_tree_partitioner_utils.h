@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCANN__PARTITIONING_KMEANS_TREE_PARTITIONER_UTILS_H_
-#define SCANN__PARTITIONING_KMEANS_TREE_PARTITIONER_UTILS_H_
+#ifndef SCANN_PARTITIONING_KMEANS_TREE_PARTITIONER_UTILS_H_
+#define SCANN_PARTITIONING_KMEANS_TREE_PARTITIONER_UTILS_H_
 
 #include "scann/distance_measures/distance_measure_factory.h"
 #include "scann/partitioning/kmeans_tree_partitioner.h"
 #include "scann/partitioning/partitioner_base.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 template <typename T>
 StatusOr<unique_ptr<Partitioner<T>>>
 KMeansTreePartitionerFactoryPreSampledAndProjected(
     const TypedDataset<T>* dataset, const PartitioningConfig& config,
-    shared_ptr<thread::ThreadPool> training_parallelization_pool) {
+    shared_ptr<ThreadPool> training_parallelization_pool) {
   DCHECK(dataset);
   const absl::Time start = absl::Now();
 
@@ -104,7 +103,6 @@ KMeansTreePartitionerFactoryPreSampledAndProjected(
   return StatusOr<unique_ptr<Partitioner<T>>>(std::move(result));
 }
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

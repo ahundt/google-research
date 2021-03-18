@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,10 +38,10 @@ void SingleTreeClustering::InitializeTree(const vector<vector<double>>& input,
   closets_open_center = vector<int>(input_.size(), -1);
 }
 
-vector<pair<int, unsigned long long_t>> SingleTreeClustering::ComputeCostAndOpen(
+vector<pair<int, uint64_t>> SingleTreeClustering::ComputeCostAndOpen(
     int center, bool open_center) {
   // The new distances if this center gets opened.
-  vector<pair<int, unsigned long long_t>> updated_distances;
+  vector<pair<int, uint64_t>> updated_distances;
   // The nodes that their distance is updated
   set<int> updated_nodes;
   vector<int> center_coordinate = input_[center];
@@ -54,7 +54,7 @@ vector<pair<int, unsigned long long_t>> SingleTreeClustering::ComputeCostAndOpen
     for (auto point : tree_.points_in_node[node]) {
       if (updated_nodes.find(point) == updated_nodes.end()) {
         updated_distances.push_back(
-            pair<int, unsigned long long_t>(point, static_cast<unsigned long long_t>(1) << (2 * i)));
+            pair<int, uint64_t>(point, static_cast<uint64_t>(1) << (2 * i)));
         if (open_center) closets_open_center[point] = center;
         updated_nodes.insert(point);
       }

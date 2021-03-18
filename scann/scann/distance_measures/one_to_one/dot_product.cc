@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 
 #include "scann/distance_measures/one_to_one/dot_product.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 double BinaryDotProductDistance::GetDistanceDense(
     const DatapointPtr<uint8_t>& a, const DatapointPtr<uint8_t>& b) const {
@@ -29,5 +28,4 @@ double BinaryDotProductDistance::GetDistanceSparse(
 
 SCANN_REGISTER_DISTANCE_MEASURE(BinaryDotProductDistance);
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

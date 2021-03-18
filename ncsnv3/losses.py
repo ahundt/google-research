@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -167,7 +167,7 @@ def ncsn_loss(rng,
   else:
     model_ema = state.optimizer.target.replace(params=state.params_ema)
     if loss_per_sigma:
-      loss, _, losses = loss_fn(model_ema)
+      loss, _, losses = loss_fn(model_ema)  # pytype: disable=bad-unpacking
     else:
       loss, *_ = loss_fn(model_ema)
 

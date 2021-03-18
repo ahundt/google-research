@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import gin.tf
 import tensorflow as tf
 from tf3d import standard_fields
 from tf3d.utils import preprocessor_utils
-from object_detection.utils import shape_utils
+from tf3d.utils import shape_utils
 
 
 _OBJECT_KEYS = [
@@ -298,7 +298,7 @@ def split_inputs(inputs,
 
 @gin.configurable(
     'object_detection_preprocess',
-    blacklist=['inputs', 'output_keys', 'is_training'])
+    denylist=['inputs', 'output_keys', 'is_training'])
 def preprocess(inputs,
                output_keys=None,
                is_training=False,

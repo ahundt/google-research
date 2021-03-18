@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCANN__OSS_WRAPPERS_SCANN_ALIGNED_MALLOC_H_
-#define SCANN__OSS_WRAPPERS_SCANN_ALIGNED_MALLOC_H_
+#ifndef SCANN_OSS_WRAPPERS_SCANN_ALIGNED_MALLOC_H_
+#define SCANN_OSS_WRAPPERS_SCANN_ALIGNED_MALLOC_H_
 
 #include <cstdlib>
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 void *aligned_malloc(size_t size, size_t minimum_alignment);
 void aligned_free(void *aligned_memory);
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

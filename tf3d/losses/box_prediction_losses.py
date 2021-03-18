@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -253,7 +253,7 @@ def _box_rotation_regression_loss_on_voxel_tensors_unbatched(
 
 @gin.configurable(
     'box_rotation_regression_loss_on_voxel_tensors',
-    blacklist=['inputs', 'outputs'])
+    denylist=['inputs', 'outputs'])
 def box_rotation_regression_loss_on_voxel_tensors(inputs,
                                                   outputs,
                                                   loss_type,
@@ -337,7 +337,7 @@ def _box_size_regression_loss_on_voxel_tensors_unbatched(
 
 @gin.configurable(
     'box_size_regression_loss_on_voxel_tensors',
-    blacklist=['inputs', 'outputs'])
+    denylist=['inputs', 'outputs'])
 def box_size_regression_loss_on_voxel_tensors(inputs,
                                               outputs,
                                               loss_type,
@@ -407,7 +407,7 @@ def _box_center_distance_loss_on_voxel_tensors_unbatched(
 
 @gin.configurable(
     'box_center_distance_loss_on_voxel_tensors',
-    blacklist=['inputs', 'outputs'])
+    denylist=['inputs', 'outputs'])
 def box_center_distance_loss_on_voxel_tensors(inputs,
                                               outputs,
                                               loss_type,
@@ -506,7 +506,7 @@ def _box_corner_distance_loss_on_voxel_tensors_unbatched(
 
 @gin.configurable(
     'box_corner_distance_loss_on_voxel_tensors',
-    blacklist=['inputs', 'outputs'])
+    denylist=['inputs', 'outputs'])
 def box_corner_distance_loss_on_voxel_tensors(
     inputs,
     outputs,
@@ -596,7 +596,7 @@ def _box_corner_distance_loss_on_object_tensors(
 
 @gin.configurable(
     'box_corner_distance_loss_on_object_tensors',
-    blacklist=['inputs', 'outputs'])
+    denylist=['inputs', 'outputs'])
 def box_corner_distance_loss_on_object_tensors(
     inputs,
     outputs,

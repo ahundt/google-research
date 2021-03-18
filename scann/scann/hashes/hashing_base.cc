@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 
 #include "scann/hashes/hashing_base.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 Status UntypedHashing::LoadParameters() {
   return UnimplementedError("Not implemented here.");
@@ -67,5 +66,4 @@ Hashing<T>::~Hashing() {}
 
 SCANN_INSTANTIATE_TYPED_CLASS(, Hashing);
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

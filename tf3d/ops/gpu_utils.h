@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ __host__ __device__ __forceinline__ uint32 FillLowerBits<uint32>(uint32 n) {
 }
 
 template <>
-__host__ __device__ __forceinline__ unsigned long long FillLowerBits<unsigned long long>(unsigned long long n) {
+__host__ __device__ __forceinline__ uint64 FillLowerBits<uint64>(uint64 n) {
   n |= n >> 1;
   n |= n >> 2;
   n |= n >> 4;

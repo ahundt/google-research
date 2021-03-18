@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class Params(object):
 
   def __post_init__(self):
     # defines the step of feeding input data
-    self.data_shape = (np.prod(self.cnn_strides),)
+    self.data_shape = (int(np.prod(self.cnn_strides)),)
 
     self.desired_samples = int(
         self.sample_rate * self.clip_duration_ms / model_flags.MS_PER_SECOND)

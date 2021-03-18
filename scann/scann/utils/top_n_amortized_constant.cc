@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,8 +19,7 @@
 
 ABSL_RETIRED_FLAG(bool, use_branch_optimized_top_n, , );
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 template <typename Distance>
 void TopNeighbors<Distance>::PartitionElements(vector<Neighbor>* elements,
@@ -32,5 +31,4 @@ void TopNeighbors<Distance>::PartitionElements(vector<Neighbor>* elements,
 
 SCANN_INSTANTIATE_TYPED_CLASS(, TopNeighbors);
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

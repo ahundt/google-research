@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 
 #include "scann/utils/common.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 AlignedBuffer MakeCacheAlignedCopy(ConstSpan<uint8_t> span) {
   const size_t padded_size1 = NextMultipleOf(span.size(), 64);
@@ -35,5 +34,4 @@ AlignedBuffer MakeCacheAlignedCopy(ConstSpan<uint8_t> span) {
   return {std::move(padded), ptr};
 }
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

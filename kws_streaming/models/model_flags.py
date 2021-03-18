@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 """Model/data settings manipulation."""
 
 import os
-from kws_streaming.data import input_data
+import kws_streaming.data.input_data_utils as du
 
 MS_PER_SECOND = 1000  # milliseconds in 1 second
 
@@ -35,8 +35,7 @@ def update_flags(flags):
   """
 
   label_count = len(
-      input_data.prepare_words_list(
-          flags.wanted_words.split(','), flags.split_data))
+      du.prepare_words_list(flags.wanted_words.split(','), flags.split_data))
   desired_samples = int(flags.sample_rate * flags.clip_duration_ms /
                         MS_PER_SECOND)
   window_size_samples = int(flags.sample_rate * flags.window_size_ms /
@@ -68,7 +67,10 @@ def update_flags(flags):
 
   # by default data_frame does not do use causal padding
   # it can cause small numerical difference in streaming mode
-  upd_flags.data_frame_padding = None
+  if flags.causal_data_frame_padding:
+    upd_flags.data_frame_padding = 'causal'
+  else:
+    upd_flags.data_frame_padding = None
 
   # summary logs for TensorBoard
   upd_flags.summaries_dir = os.path.join(flags.train_dir, 'logs/')

@@ -11,6 +11,12 @@ where model receives portion of the input sequence (for example 20ms of audio),
 process it incrementally and return an output(for example classification result).
 Non streaming means that model has to receive the whole sequence
 (for example 1 sec of audio) and then return an output.
+
+During training we use one neural network architecture (called non streaming) and during inference we will use another neural network architecture called streaming.
+This kind of neural network can be considered dynamic: model topology is different in training and inference modes.
+One solution of such problem can be [subclassing](https://www.tensorflow.org/guide/keras/functional#mix-and-match_api_styles), which supports dynamic architectures.
+In this lib we choose keras functional API because of its [advantages](https://www.tensorflow.org/guide/keras/functional#it_does_not_support_dynamic_architectures), but it [does not support dynamic architectures](https://www.tensorflow.org/guide/keras/functional#it_does_not_support_dynamic_architectures). We solved it by using a cloning function, which can automatically convert non streamable model to streamable one (if model is based on streaming aware layers).
+
 We applied this lib for keyword spotting (KWS) problem
 and implemented most popular KWS models:
 
@@ -42,6 +48,12 @@ We explored latency and accuracy of the streaming and non streaming models
 on mobile phone and demonstrated that models outperform previously reported accuracy on public data sets.
 This lib also can be applied on other sequence problems
 such as speech noise reduction, sound detection, text classification...
+
+## Quick onboarding with toy demo:
+Step by step demo is shown in [colabs](https://github.com/google-research/google-research/tree/master/kws_streaming/colab):
+1. Download the data and check its properties [00_check_data.ipynb](https://github.com/google-research/google-research/blob/master/kws_streaming/colab/00_check_data.ipynb)
+2. Train toy svdf or ds_tc_resnet models [01_train.ipynb](https://github.com/google-research/google-research/blob/master/kws_streaming/colab/01_train.ipynb)
+3. Run inference in streaming and non streaming modes [02_inference.ipynb](https://github.com/google-research/google-research/blob/master/kws_streaming/colab/02_inference.ipynb)
 
 ## Experimentation steps
 NN model conversion from non streaming mode (which is frequently
@@ -80,13 +92,13 @@ The latest experiments on speech commands V2 with 12 labels are show in below ta
 |  Model name      | accuracy [%]  | # parameters |
 | ---------------- | --------------------- | --------------------- |
 |[ds_tc_resnet](https://github.com/google-research/google-research/blob/master/kws_streaming/experiments/kws_experiments_12_labels.md) with <br> [MatchboxNet](https://arxiv.org/abs/2004.08531) topology | 98.0      | 75K      |
-|[att_mh_rnn ](https://github.com/google-research/google-research/blob/master/kws_streaming/experiments/kws_experiments_12_labels.md)| 98.3  |   750K     |
+|[att_mh_rnn ](https://github.com/google-research/google-research/blob/master/kws_streaming/experiments/kws_experiments_12_labels.md)| 98.4  |   750K     |
 
 The latest experiments on speech commands V2 with 35 labels are show in below table:
 |  Model name      | accuracy [%]  | # parameters |
 | ---------------- | --------------------- | --------------------- |
 |[ds_tc_resnet](https://github.com/google-research/google-research/blob/master/kws_streaming/experiments/kws_experiments_35_labels.md) with <br> [MatchboxNet](https://arxiv.org/abs/2004.08531) topology | 96.9      | 75K      |
-
+|[att_mh_rnn ](https://github.com/google-research/google-research/blob/master/kws_streaming/experiments/kws_experiments_35_labels.md)| 97.2  |   750K     |
 
 
 ### Streamable and non streamable models
@@ -295,7 +307,7 @@ cd ../
 ### Run only model evaluation:
 
 ```shell
-python -m kws_streaming.train.model_train_eval \
+python3 -m kws_streaming.train.model_train_eval \
 --data_url '' \
 --data_dir ./data1/ \
 --train_dir ./models1/dnn/ \
@@ -322,7 +334,7 @@ dnn \
 ### Re-train dnn model from scratch on data set V1 and run evaluation:
 
 ```shell
-python -m kws_streaming.train.model_train_eval \
+python3 -m kws_streaming.train.model_train_eval \
 --data_url '' \
 --data_dir ./data1/ \
 --train_dir ./models1/dnn_1/ \
@@ -361,7 +373,7 @@ evaluated in unquantized and quantized form (only post training quantization is 
 
 
 ```shell
-python -m kws_streaming.train.model_train_eval \
+python3 -m kws_streaming.train.model_train_eval \
 --data_url '' \
 --data_dir ./data1/ \
 --train_dir ./models1/dnn_1/ \
@@ -423,6 +435,9 @@ If speech feature extractor is part of the model then it is convenient for deplo
 
 
 ### Training on custom data
+
+A detailed example of model training on custom data shown in [link](https://github.com/google-research/google-research/blob/master/kws_streaming/experiments/kws_experiments_35_labels.md) with short overview below.
+
 If you prefer to train on your own data, you'll need to create .wavs with your
 recordings, all at a consistent length, and then arrange them into subfolders
 organized by label. For example, here's a possible file structure:
@@ -447,7 +462,7 @@ the audio in the 'other' folder would be used to train an 'unknown' category.
 To pull this all together, you'd run:
 
 ```shell
-python -m kws_streaming.train.model_train_eval \
+python3 -m kws_streaming.train.model_train_eval \
 --data_dir ./data \
 --wanted_words up,down \
 dnn
@@ -488,7 +503,7 @@ data >
 To pull this all together, you'd run:
 
 ```shell
-python -m kws_streaming.train.model_train_eval \
+python3 -m kws_streaming.train.model_train_eval \
 --data_dir ./data \
 --split_data 0 \
 --wanted_words up,down \

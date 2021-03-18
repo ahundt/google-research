@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 
 #include "scann/distance_measures/one_to_one/l2_distance.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 SCANN_DEFINE_DISTANCE_MEASURE_VIRTUAL_METHODS(SquaredL2Distance,
                                               kEarlyStoppingNotSupported);
@@ -25,5 +24,4 @@ SCANN_DEFINE_DISTANCE_MEASURE_VIRTUAL_METHODS(NegatedSquaredL2Distance,
                                               kEarlyStoppingNotSupported);
 SCANN_REGISTER_DISTANCE_MEASURE(NegatedSquaredL2Distance);
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann

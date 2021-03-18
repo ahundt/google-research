@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,9 +20,11 @@ from __future__ import division
 from __future__ import print_function
 
 # pylint: disable=unused-import
+from model_pruning.python.hparam import HParams
 from model_pruning.python.layers.rnn_cells import MaskedBasicLSTMCell
 from model_pruning.python.layers.rnn_cells import MaskedLSTMCell
 from model_pruning.python.pruning import apply_mask
+from model_pruning.python.pruning import apply_mask_with_group
 from model_pruning.python.pruning import get_masked_weights
 from model_pruning.python.pruning import get_masks
 from model_pruning.python.pruning import get_pruning_hparams
@@ -32,6 +34,8 @@ from model_pruning.python.pruning import get_weights
 from model_pruning.python.pruning import Pruning
 from model_pruning.python.pruning_hook import ModelPruningHook
 from model_pruning.python.pruning_hook import ModelPruningListener
+from model_pruning.python.pruning_interface import add_compression_summaries
+from model_pruning.python.pruning_interface import apply_customized_lstm_matrix_compression
 from model_pruning.python.pruning_interface import apply_matrix_compression
 from model_pruning.python.pruning_interface import apply_pruning
 from model_pruning.python.pruning_interface import get_matrix_compression_object

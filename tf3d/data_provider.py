@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -136,7 +136,7 @@ def tfrecord_read_fn(filename):
 
 
 @gin.configurable(
-    'get_tf_data_decoder', blacklist=['batch_size', 'is_training'])
+    'get_tf_data_decoder', denylist=['batch_size', 'is_training'])
 def get_tf_data_decoder(dataset_format,
                         decode_fn,
                         file_pattern,
@@ -231,7 +231,7 @@ def get_tf_data_decoder(dataset_format,
 
 
 
-@gin.configurable(blacklist=['batch_size', 'is_training'])
+@gin.configurable(denylist=['batch_size', 'is_training'])
 def get_tf_data_dataset(dataset_name,
                         split_name,
                         batch_size,

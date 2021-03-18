@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCANN__UTILS_INPUT_DATA_UTILS_H_
-#define SCANN__UTILS_INPUT_DATA_UTILS_H_
+#ifndef SCANN_UTILS_INPUT_DATA_UTILS_H_
+#define SCANN_UTILS_INPUT_DATA_UTILS_H_
 
 #include "scann/data_format/dataset.h"
 #include "scann/proto/hash.pb.h"
 #include "scann/utils/fixed_point/pre_quantized_fixed_point.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 StatusOr<DatapointIndex> ComputeConsistentNumPointsFromIndex(
     const Dataset* dataset, const DenseDataset<uint8_t>* hashed_dataset,
@@ -34,7 +33,6 @@ StatusOr<DimensionIndex> ComputeConsistentDimensionalityFromIndex(
     const PreQuantizedFixedPoint* pre_quantized_fixed_point,
     const DenseDataset<uint8_t>* compressed_dataset);
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

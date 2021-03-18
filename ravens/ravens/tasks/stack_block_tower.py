@@ -28,12 +28,14 @@ class StackBlockTower(Task):
   def __init__(self):
     super().__init__()
     self.max_steps = 12
+    self.pos_eps = 0.01
+    self.rot_eps = np.deg2rad(180)
 
   def reset(self, env):
     super().reset(env)
 
     # Add base.
-    base_size = (0.05, 0.15, 0.005)
+    base_size = (0.05 * (5./4.), 0.15 * (5./4.), 0.005 * (5./4.))
     base_urdf = 'assets/stacking/stand.urdf'
     base_pose = self.get_random_pose(env, base_size)
     env.add_object(base_urdf, base_pose, 'fixed')
@@ -47,7 +49,7 @@ class StackBlockTower(Task):
     # Add blocks.
     objs = []
     # sym = np.pi / 2
-    block_size = (0.04, 0.04, 0.04)
+    block_size = (0.05, 0.05, 0.05)
     block_urdf = 'assets/stacking/block.urdf'
     for i in range(6):
       block_pose = self.get_random_pose(env, block_size)
@@ -60,7 +62,7 @@ class StackBlockTower(Task):
     #              (0, 0.05, 0.03), (0, -0.025, 0.08),
     #              (0, 0.025, 0.08), (0, 0, 0.13)]
     goal_height = 4
-    place_pos = [(0, 0.0, 0.03 + 0.06 * i) for i in range(goal_height)]
+    place_pos = [(0, 0.0, 0.03 + (block_size[0] + 0.01) * i) for i in range(goal_height)]
     targs = [(utils.apply(base_pose, i), base_pose[1]) for i in place_pos]
 
     # Goal: blocks are stacked in a tower (green, blue, purple, yellow, orange, red).

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import gin.tf
 import tensorflow as tf
 
 from tf3d.layers import sparse_voxel_net_utils
-from object_detection.utils import shape_utils
+from tf3d.utils import shape_utils
 
 
 compute_pooled_voxel_indices = sparse_voxel_net_utils.compute_pooled_voxel_indices

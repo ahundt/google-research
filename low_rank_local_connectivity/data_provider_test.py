@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ _IMAGE_SHAPE_DICT = {
     "mnist": (28, 28, 1),
     "cifar10": (32, 32, 3),
     "celeba32": (32, 32, 3),
+    "trans_celeba48": (48, 48, 3),
 }
 
 

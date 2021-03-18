@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
 # limitations under the License.
 
 """Monte Carlo Tree Search (MCTS) player implementation."""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 import random
 import time
 from absl import logging
@@ -27,7 +24,7 @@ from polish.mcts import mcts_node as m_node
 from polish.utils import performance
 
 
-@gin.configurable(blacklist=['call_policy'])
+@gin.configurable(denylist=['call_policy'])
 class MCTSPlayer(object):
   """Monte Carlo Tree Search (MCTS) player class.
 

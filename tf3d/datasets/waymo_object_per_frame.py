@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ def _prepare_lidar_points(inputs, lidar_names):
 
 
 @gin.configurable(
-    'waymo_prepare_lidar_images_and_correspondences', blacklist=['inputs'])
+    'waymo_prepare_lidar_images_and_correspondences', denylist=['inputs'])
 def prepare_lidar_images_and_correspondences(
     inputs,
     resized_image_height,
@@ -224,7 +224,7 @@ def prepare_lidar_images_and_correspondences(
 
 
 @gin.configurable(
-    'waymo_object_per_frame_compute_semantic_labels', blacklist=['inputs'])
+    'waymo_object_per_frame_compute_semantic_labels', denylist=['inputs'])
 def compute_semantic_labels(inputs, points_key, box_margin=0.1):
   """Computes ground-truth semantic labels of the points.
 
@@ -275,7 +275,7 @@ def compute_semantic_labels(inputs, points_key, box_margin=0.1):
 
 @gin.configurable(
     'waymo_object_per_frame_compute_motion_labels',
-    blacklist=['scene', 'frame0', 'frame1', 'frame_start_index',])
+    denylist=['scene', 'frame0', 'frame1', 'frame_start_index',])
 def compute_motion_labels(scene,
                           frame0,
                           frame1,

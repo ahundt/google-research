@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
 
 
 
-#ifndef SCANN__UTILS_FACTORY_HELPERS_H_
-#define SCANN__UTILS_FACTORY_HELPERS_H_
+#ifndef SCANN_UTILS_FACTORY_HELPERS_H_
+#define SCANN_UTILS_FACTORY_HELPERS_H_
 
 #include "scann/distance_measures/distance_measures.h"
 #include "scann/proto/scann.pb.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 struct GenericSearchParameters {
   Status PopulateValuesFromScannConfig(const ScannConfig& config);
@@ -39,7 +38,6 @@ struct GenericSearchParameters {
   float post_reordering_epsilon = numeric_limits<float>::quiet_NaN();
 };
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

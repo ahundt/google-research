@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,6 +79,8 @@ class Params(object):
     self.sp_resample = 0.0
     self.pick_deterministically = 0
     self.verbosity = logging.INFO
+    self.causal_data_frame_padding = 0
+    self.wav = 1
 
 
 def att_mh_rnn_params():

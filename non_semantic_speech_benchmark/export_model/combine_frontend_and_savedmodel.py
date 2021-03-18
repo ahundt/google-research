@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -181,9 +181,7 @@ def convert_tflite_file(model_dir):
   converter = tf.lite.TFLiteConverter.from_saved_model(
       saved_model_dir=model_dir, signature_keys=['inference'])
 
-  # TODO(srjoglekar): Explore quantization later.
-  converter.optimizations = []
-  converter.post_training_quantize = False
+  converter.optimizations = [tf.lite.Optimize.DEFAULT]
   converter.target_spec.supported_ops = [
       tf.lite.OpsSet
       .TFLITE_BUILTINS,  # enable TensorFlow Lite builtin ops only.

@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include "intersect_edges.h"  // NOLINT
 #include "mmapped_vector.h"   // NOLINT
 
-using edge_t = unsigned long long_t;
+using edge_t = uint64_t;
 using node_t = uint32_t;
 
 using Graph = GraphT<node_t, edge_t>;

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -641,7 +641,7 @@ class OutOfGraphReplayBuffer(object):
 
 
 @gin.configurable(
-    blacklist=['observation_shape', 'stack_size', 'update_horizon'])
+    denylist=['observation_shape', 'stack_size', 'update_horizon'])
 class WrappedReplayBuffer(object):
   """Wrapper of OutOfGraphReplayBuffer with an in graph sampling mechanism.
 

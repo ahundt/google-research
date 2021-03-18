@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,16 +14,15 @@
 
 
 
-#ifndef SCANN__PROJECTION_PROJECTION_FACTORY_H_
-#define SCANN__PROJECTION_PROJECTION_FACTORY_H_
+#ifndef SCANN_PROJECTION_PROJECTION_FACTORY_H_
+#define SCANN_PROJECTION_PROJECTION_FACTORY_H_
 
 #include "scann/data_format/dataset.h"
 #include "scann/projection/chunking_projection.h"
 #include "scann/projection/projection_base.h"
 #include "scann/proto/projection.pb.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 template <typename T>
 class ProjectionFactoryImpl {
@@ -69,7 +68,6 @@ inline StatusOr<unique_ptr<ChunkingProjection<T>>> ChunkingProjectionFactory(
 
 SCANN_INSTANTIATE_TYPED_CLASS(extern, ProjectionFactoryImpl);
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

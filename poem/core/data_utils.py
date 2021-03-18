@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -97,6 +97,25 @@ def flatten_first_dims(x, num_last_dims_to_keep):
   return tf.reshape(x, new_shape_list)
 
 
+def unflatten_first_dim(x, shape_to_unflatten):
+  """Unflattens the first dimension of a tensor.
+
+  For example:
+    x.shape.as_list() == [6, 2].
+    unflatten_first_dim(x, [2, 3]).shape.as_list() == [2, 3, 2].
+
+  Args:
+    x: A tensor to unflatten.
+    shape_to_unflatten: A list of integers to reshape the first dimension of `x`
+      into.
+
+  Returns:
+    A unflattened tensor.
+  """
+  new_shape = list(shape_to_unflatten) + x.shape.as_list()[1:]
+  return tf.reshape(x, new_shape)
+
+
 def tile_first_dims(x, first_dim_multiples):
   """Tiles the first dimensions of a tensor.
 
@@ -178,6 +197,49 @@ def recursively_expand_dims(x, axes):
   return x
 
 
+def get_shape_by_last_dims(x, num_last_dims):
+  """Gets tensor shape by the last dimensions.
+
+  For example:
+    x.shape.as_list() == [1, 2, 3, 4, 5]
+    get_shape_by_last_dims(x, num_last_dims=2) == [4, 5].
+
+  Args:
+    x: A tensor to get shape of.
+    num_last_dims: An integer for the number of last dimensions to get shape of.
+
+  Returns:
+    A list for tensor shape.
+  """
+  shape = tf.shape(x)
+  output_shape = []
+  for i in range(x.shape.ndims - num_last_dims, x.shape.ndims):
+    output_shape.append(shape[i])
+  return output_shape
+
+
+def get_shape_by_first_dims(x, num_last_dims):
+  """Gets tensor shape by the first dimensions.
+
+  For example:
+    x.shape.as_list() == [1, 2, 3, 4, 5]
+    get_shape_by_first_dims(x, num_last_dims=2) == [1, 2, 3].
+
+  Args:
+    x: A tensor to get shape of.
+    num_last_dims: An integer for the number of last dimensions not to get shape
+      of.
+
+  Returns:
+    A list for tensor shape.
+  """
+  shape = tf.shape(x)
+  output_shape = []
+  for i in range(0, x.shape.ndims - num_last_dims):
+    output_shape.append(shape[i])
+  return output_shape
+
+
 def reshape_by_last_dims(x, last_dim_shape):
   """Reshapes a tensor by the last dimensions.
 
@@ -199,10 +261,52 @@ def reshape_by_last_dims(x, last_dim_shape):
     A reshaped tensor.
   """
   new_shape = []
-  for d in range(len(x.shape.as_list()) - len(last_dim_shape)):
-    new_shape.append(tf.shape(x)[d])
+  for i in range(len(x.shape.as_list()) - len(last_dim_shape)):
+    d = x.shape.as_list()[i]
+    new_shape.append(-1 if d is None else d)
   new_shape.extend(last_dim_shape)
   return tf.reshape(x, new_shape)
+
+
+def swap_axes(x, lhs_axis, rhs_axis):
+  """Permutes a tensor by swapping two axes.
+
+  Args:
+    x: A tensor to permute.
+    lhs_axis: An integer for one of the axes to swap.
+    rhs_axis: An integer for one of the axes to swap.
+
+  Returns:
+    A permuted tensor.
+  """
+  permutation = list(range(x.shape.ndims))
+  permutation[lhs_axis], permutation[rhs_axis] = (permutation[rhs_axis],
+                                                  permutation[lhs_axis])
+  return tf.transpose(x, permutation)
+
+
+def move_axis(x, input_axis, output_axis):
+  """Permutes a tensor such that an axis is moved to the destination axis.
+
+  Example:
+    x.shape.as_list() == [1, 2, 3, 4, 5].
+    x = move_axis(x, input_axis=1, output_axis=-2)
+    x.shape.as_list() == [1, 3, 4, 2, 5].
+
+  Args:
+    x: A tensor to permute.
+    input_axis: An integer for the axis to move.
+    output_axis: An integer for the destination to move the input axis to.
+
+  Returns:
+    A permuted tensor.
+  """
+  permutation = list(range(x.shape.ndims))
+  if output_axis < 0:
+    output_axis += len(permutation)
+  axis_index = permutation.pop(input_axis)
+  permutation.insert(output_axis, axis_index)
+  return tf.transpose(x, permutation)
 
 
 def reduce_weighted_mean(tensor, weights, axis=None, keepdims=False):
@@ -268,7 +372,8 @@ def compute_lower_percentile_means(x, axis, q=50):
           tf.math.reduce_sum(weights, axis=axis))
 
 
-def mix_batch(lhs_batches, rhs_batches, axis, assignment=None, seed=None):
+def mix_batch(lhs_batches, rhs_batches, axis, assignment=None,
+              keep_lhs_prob=0.5, seed=None):
   """Mixes batches.
 
   A pair of tensors from the same location in each list are assumed to have the
@@ -348,6 +453,8 @@ def mix_batch(lhs_batches, rhs_batches, axis, assignment=None, seed=None):
       dimensions" between the batch dimension (0) and the mixing axis dimension,
       size 1 can be used to take advantage of broadcasting. If None, A uniformly
       random assignment matrix will be created.
+    keep_lhs_prob: A float indicates the probability to randomly keep
+      lhs_batches along axis. This is only useful when `assignment` is None.
     seed: An integer for random seed.
 
   Returns:
@@ -374,7 +481,7 @@ def mix_batch(lhs_batches, rhs_batches, axis, assignment=None, seed=None):
     assignment_shape[axis] = batch_shape[axis]
     assignment = tf.random.uniform(
         assignment_shape, minval=0.0, maxval=1.0, seed=seed)
-    assignment = tf.math.greater_equal(assignment, 0.5)
+    assignment = tf.math.greater_equal(assignment, keep_lhs_prob)
     return assignment
 
   if assignment is None:
@@ -401,6 +508,8 @@ def mix_batch(lhs_batches, rhs_batches, axis, assignment=None, seed=None):
     if len(lhs_batch.shape.as_list()) > assignment_rank:
       batch_assignment = recursively_expand_dims(
           assignment, axes=[-1] * (batch_rank - assignment_rank))
+    else:
+      batch_assignment = assignment
 
     mixed_batches.append(tf.where(batch_assignment, lhs_batch, rhs_batch))
 

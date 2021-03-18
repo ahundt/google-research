@@ -1,4 +1,4 @@
-// Copyright 2020 The Google Research Authors.
+// Copyright 2021 The Google Research Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SCANN__UTILS_NOISE_SHAPING_UTILS_H_
-#define SCANN__UTILS_NOISE_SHAPING_UTILS_H_
+#ifndef SCANN_UTILS_NOISE_SHAPING_UTILS_H_
+#define SCANN_UTILS_NOISE_SHAPING_UTILS_H_
 
 #include "scann/utils/types.h"
 
-namespace tensorflow {
-namespace scann_ops {
+namespace research_scann {
 
 template <typename T>
 T Square(T x) {
@@ -34,7 +33,6 @@ inline double ComputeParallelCostMultiplier(double threshold,
   return parallel_cost / perpendicular_cost;
 }
 
-}  // namespace scann_ops
-}  // namespace tensorflow
+}  // namespace research_scann
 
 #endif

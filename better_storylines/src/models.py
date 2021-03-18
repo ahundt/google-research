@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -250,7 +250,7 @@ class ResidualModel(LinearModel):
     return x_input, x
 
 
-@gin.configurable(whitelist=['network_class'])
+@gin.configurable(allowlist=['network_class'])
 def build_model(num_input_sentences,
                 embedding_matrix=None,
                 embedding_dim=None,

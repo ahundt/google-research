@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The Google Research Authors.
+# Copyright 2021 The Google Research Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -447,6 +447,18 @@ def base_parser():
       type=int,
       default=0,
       help='Pick training data in every epoch deterministically',
+  )
+  parser.add_argument(
+      '--causal_data_frame_padding',
+      type=int,
+      default=0,
+      help='Apply causal padding on DataFrame layer',
+  )
+  parser.add_argument(
+      '--wav',
+      type=int,
+      default=1,
+      help='Use data in wav format, otherwise use numpy',
   )
 
   return parser
