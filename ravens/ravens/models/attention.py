@@ -180,7 +180,8 @@ class Attention:
     self.model.load_weights(path)
 
   def save(self, filename):
-    self.model.save(filename)
+    # self.model.save(filename)
+    self.model.save_weights(filename)
 
   def get_se2(self, n_rotations, pivot, reverse=False):
     """Get SE2 rotations discretized into n_rotations angles counter-clockwise."""

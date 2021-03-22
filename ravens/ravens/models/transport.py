@@ -418,7 +418,8 @@ class Transport:
     return np.array(rvecs, dtype=np.float32)
 
   def save(self, fname):
-    self.model.save(fname)
+    # self.model.save(fname)
+    self.model.save_weights(fname)
 
   def load(self, fname):
     self.model.load_weights(fname)
