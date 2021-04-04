@@ -245,7 +245,7 @@ class TransporterAgent:
 class OriginalTransporterAgent(TransporterAgent):
 
   def __init__(self, name, task, n_rotations=36, model_name='vit'):
-    super().__init__(name, task, n_rotations)
+    super().__init__(name, task, n_rotations, model_name=model_name)
 
     self.attention = Attention(
         in_shape=self.in_shape,
