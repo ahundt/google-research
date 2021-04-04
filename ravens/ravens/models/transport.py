@@ -344,9 +344,13 @@ class Transport:
     # crop = tf.identity(kernel_bef_crop)
     crop = tf.repeat(crop, repeats=self.n_rotations, axis=0)
     crop = tfa.image.transform(crop, rvecs, interpolation='NEAREST')
-    crop = crop[:, p[0]:(p[0] + self.crop_size),
-                p[1]:(p[1] + self.crop_size), :]
-    logits, kernel_raw = self.model([in_tensor, crop])
+
+    kernel_raw = crop[:, p[0]:(p[0] + self.crop_size),
+    						p[1]:(p[1] + self.crop_size), :]
+
+    # crop = crop[:, p[0]:(p[0] + self.crop_size),
+    #             p[1]:(p[1] + self.crop_size), :]
+    # logits, kernel_raw = self.model([in_tensor, crop])
 
     # Crop after network (for receptive field, and more elegant).
     # logits, crop = self.model([in_tensor, in_tensor])
