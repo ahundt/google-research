@@ -46,6 +46,7 @@ class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
                use_bias,               
                runtimes=None,
                dropout_rate=None,
+               name='',
                **kwargs):
     
     super(DepthwiseConv2DMasked, self).__init__(
@@ -54,6 +55,7 @@ class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
             depthwise_initializer=depthwise_initializer, 
             padding=padding, 
             use_bias=use_bias,
+            name=name,
             **kwargs)
 
     self.runtimes = runtimes

@@ -67,6 +67,7 @@ class Attention:
         in0,
         model_name='single-path-search', # default option, add flags for other search space: ref @single-path-nas search_main.py
         training=is_training,
+        prefix='attention',
         # override_params=override_params, 
         dropout_rate=dropout_rate)
       # print("attention supernet shapes", in0.shape, out0.shape)

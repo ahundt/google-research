@@ -92,6 +92,7 @@ class Transport:
         in0,
         model_name='single-path-search', # default option, add flags for other search space: ref @single-path-nas search_main.py
         training=is_training,
+        prefix='transport',
         # override_params=override_params, 
         dropout_rate=dropout_rate)
       print("xx-1",out0.shape)
