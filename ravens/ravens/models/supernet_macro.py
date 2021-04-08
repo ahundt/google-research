@@ -185,8 +185,8 @@ def build_supernet(images, model_name, training, prefix='', override_params=None
     #       layer._name = layer.name + prefix
     #       print(layer.name)
     # print(model.name)
-    logits, total_runtime = model(images, training=training)
+    logits, total_runtime, indicators = model(images, training=training)
     # call method enables to write classes where the instances behave like functions and can be called like a function
 
   logits = tf.identity(logits, 'logits')
-  return logits, total_runtime, model.indicators
+  return logits, total_runtime, indicators

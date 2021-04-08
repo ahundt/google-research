@@ -111,15 +111,30 @@ class TransporterAgent:
 
     # Get training losses.
     step = self.total_steps + 1
-    loss0 = self.attention.train(img, p0, p0_theta)
-    if isinstance(self.transport, Attention):
-      loss1 = self.transport.train(img, p1, p1_theta)
+
+    if self.model_name=='supernet':
+      loss0, attention_indicators = self.attention.train(img, p0, p0_theta)
+      if isinstance(self.transport, Attention):
+        loss1, transport_indicators = self.transport.train(img, p1, p1_theta)
+      else:
+        loss1, transport_indicators = self.transport.train(img, p0, p1, p1_theta)
+      with writer.as_default():
+        sc = tf.summary.scalar
+        sc('train_loss/attention', loss0, step)
+        sc('train_loss/transport', loss1, step)
+        tf.summary.write('indicators/transport', transport_indicators, step)
+        tf.summary.write('indicators/attention', attention_indicators, step)
     else:
-      loss1 = self.transport.train(img, p0, p1, p1_theta)
-    with writer.as_default():
-      sc = tf.summary.scalar
-      sc('train_loss/attention', loss0, step)
-      sc('train_loss/transport', loss1, step)
+      loss0 = self.attention.train(img, p0, p0_theta)
+      if isinstance(self.transport, Attention):
+        loss1 = self.transport.train(img, p1, p1_theta)
+      else:
+        loss1 = self.transport.train(img, p0, p1, p1_theta)
+      with writer.as_default():
+        sc = tf.summary.scalar
+        sc('train_loss/attention', loss0, step)
+        sc('train_loss/transport', loss1, step)
+
     print(f'Train Iter: {step} attention loss: {loss0:.4f} transport loss: {loss1:.4f}')
     self.total_steps = step
 

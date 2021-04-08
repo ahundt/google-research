@@ -475,8 +475,19 @@ class SinglePathSuperNet(tf.keras.Model):
     #   self.endpoints['head'] = outputs
 
     # print("supernet @@@@",self.indicators)
-    #  save the indicators to a file
-    with open(self.prefix + "_indicators.pkl", 'ab+') as file:
-      pickle.dump(self.indicators, file)
 
-    return outputs, total_runtime
+    decision_labels = ['d5x5','d50c','d100c']
+    t_list = []
+    for idx in range(20): 
+      key_ = 'block_' + str(idx+1)
+      for decision_label in decision_labels:
+        v = self.indicators[key_][decision_label]
+        t_list.append(tf.reshape(v, [1]))
+    t_list_float = [float(i) for i in t_list]
+    indicators=tf.reshape(t_list_float, (20, 3))
+
+    # #  save the indicators to a file
+    # with open(self.prefix + "_indicators.pkl", 'ab+') as file:
+    #   pickle.dump(self.indicators, file)
+
+    return outputs, total_runtime, indicators
