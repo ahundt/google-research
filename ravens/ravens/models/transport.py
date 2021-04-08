@@ -415,8 +415,8 @@ class Transport:
     self.iters += 1
     if self.model_name == 'supernet':
     	return np.float32(loss), indicators
-	else:
-		return np.float32(loss)
+    else:
+    	return np.float32(loss)
 
   def get_se2(self, n_rotations, pivot):
     """Get SE2 rotations discretized into n_rotations angles counter-clockwise."""
