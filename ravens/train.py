@@ -25,6 +25,8 @@ from ravens import agents
 from ravens import Dataset
 import tensorflow as tf
 
+policy = tf.keras.mixed_precision.experimental.Policy('mixed_float16')
+tf.keras.mixed_precision.experimental.set_policy(policy)
 
 def main():
 
