@@ -24,6 +24,7 @@ import numpy as np
 from ravens import agents
 from ravens import Dataset
 import tensorflow as tf
+from tqdm import tqdm
 
 policy = tf.keras.mixed_precision.experimental.Policy('mixed_float16')
 tf.keras.mixed_precision.experimental.set_policy(policy)
@@ -88,11 +89,13 @@ def main():
     train_dataset.set(episodes)
 
     # Train agent and save snapshots.
-    while agent.total_steps < args.n_steps:
-      for _ in range(args.interval):
-        agent.train(train_dataset, writer)
-      agent.validate(test_dataset, writer)
-      agent.save()
+    # while agent.total_steps < args.n_steps:
+    for _ in tqdm(range(args.n_steps), dynamic_ncols=True):
+      agent.train(train_dataset, writer)
+      # for _ in tqdm(range(args.interval)):
+      if agent.total_steps % args.interval == 0:
+        agent.validate(test_dataset, writer)
+        agent.save()
 
     # train supernet/ train final (delete pre existiing model - destroy and create onjects)
 
