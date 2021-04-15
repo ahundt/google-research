@@ -25,8 +25,8 @@ def Indicator(x):
   #TypeError: Value passed to parameter 'x' has DataType bool not in list of allowed values: 
   #           bfloat16, float16, float32, float64, uint8, int8, uint16, int16, 
   #           int32, int64, complex64, complex128
-  #return tf.stop_gradient((x>=0) - tf.sigmoid(x)) + tf.sigmoid(x)
-  return tf.stop_gradient(tf.cast(x>=0, dtype=tf.float32) - tf.sigmoid(x)) + tf.sigmoid(x)
+  return tf.stop_gradient(tf.cast(x>=0, dtype=tf.float16) - tf.sigmoid(x)) 
+  # return tf.stop_gradient(tf.cast(x>=0, dtype=tf.float32) - tf.sigmoid(x)) + tf.sigmoid(x)
   # tf.stop_gradient: When building ops to compute gradients, this op prevents the contribution 
   # of its inputs to be taken into account. If you insert this op in the graph
   # it inputs are masked from the gradient generator. They are not taken into account for computing gradients.
@@ -46,6 +46,7 @@ class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
                use_bias,               
                runtimes=None,
                dropout_rate=None,
+               name='',
                **kwargs):
     
     super(DepthwiseConv2DMasked, self).__init__(
@@ -54,9 +55,11 @@ class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
             depthwise_initializer=depthwise_initializer, 
             padding=padding, 
             use_bias=use_bias,
+            name=name,
             **kwargs)
 
     self.runtimes = runtimes
+    dropout_rate = tf.dtypes.cast(dropout_rate, tf.float16)
     self.dropout_rate = tf.stop_gradient(dropout_rate)
 
     if kernel_size[0] != 5: # normal Depthwise type
@@ -64,15 +67,23 @@ class DepthwiseConv2DMasked(tf.keras.layers.DepthwiseConv2D):
     else:
       self.custom = True 
       if self.runtimes is not None:
-        self.R50c = K.cast_to_floatx(self.runtimes[2]) # 50% of the 5x5
-        self.R100c = K.cast_to_floatx(self.runtimes[3]) # 100% of the 5x5
-        self.R5x5 = K.cast_to_floatx(self.runtimes[3]) # 5x5 for 100%
-        self.R3x3 = K.cast_to_floatx(self.runtimes[1]) # 3x3 for 100%
+        # self.R50c = K.cast_to_floatx(self.runtimes[2]) # 50% of the 5x5
+        # self.R100c = K.cast_to_floatx(self.runtimes[3]) # 100% of the 5x5
+        # self.R5x5 = K.cast_to_floatx(self.runtimes[3]) # 5x5 for 100%
+        # self.R3x3 = K.cast_to_floatx(self.runtimes[1]) # 3x3 for 100%
+        self.R50c = self.runtimes[2] # 50% of the 5x5
+        self.R100c = self.runtimes[3] # 100% of the 5x5
+        self.R5x5 = self.runtimes[3] # 5x5 for 100%
+        self.R3x3 = self.runtimes[1] # 3x3 for 100%
       else:
-        self.R50c = K.cast_to_floatx(0.0)
-        self.R100c = K.cast_to_floatx(0.0)
-        self.R5x5 = K.cast_to_floatx(0.0)
-        self.R3x3 = K.cast_to_floatx(0.0)
+        # self.R50c = K.cast_to_floatx(0.0)
+        # self.R100c = K.cast_to_floatx(0.0)
+        # self.R5x5 = K.cast_to_floatx(0.0)
+        # self.R3x3 = K.cast_to_floatx(0.0)
+        self.R50c = 0.0
+        self.R100c = 0.0
+        self.R5x5 = 0.0
+        self.R3x3 = 0.0
 
 
   def build(self, input_shape):

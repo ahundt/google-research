@@ -116,7 +116,7 @@ class MBConvBlock(object):
     endpoints: dict. A list of internal tensors.
   """
 
-  def __init__(self, block_args, global_params, layer_runtimes, dropout_rate):
+  def __init__(self, block_args, global_params, layer_runtimes, dropout_rate, prefix):
     """Initializes a MBConv block.
 
     Args:
@@ -138,6 +138,7 @@ class MBConvBlock(object):
     self.endpoints = None
     self.runtimes = layer_runtimes
     self.dropout_rate = dropout_rate
+    self.prefix = prefix
 
     self._search_space = global_params.search_space
     # Builds the block accordings to arguments.
@@ -158,11 +159,13 @@ class MBConvBlock(object):
           strides=[1, 1],
           kernel_initializer=conv_kernel_initializer,
           padding='same',
+          name='expand_conv_'+self.prefix,
           use_bias=False)
       self._bn0 = tf.compat.v1.layers.BatchNormalization(
           axis=self._channel_axis,
           momentum=self._batch_norm_momentum,
           epsilon=self._batch_norm_epsilon,
+          name='expand_conv_bn_'+self.prefix,
           fused=True)
 
     kernel_size = self._block_args.kernel_size
@@ -176,6 +179,7 @@ class MBConvBlock(object):
         # todo make changes for dilation
         depthwise_initializer=conv_kernel_initializer,
         padding='same',
+        name='depthwise_conv_'+self.prefix,
         use_bias=False)
 
     # Learnable Depth-wise convolution Superkernel
@@ -188,6 +192,7 @@ class MBConvBlock(object):
         depthwise_initializer=conv_kernel_initializer,
         padding='same', runtimes=self.runtimes,
         dropout_rate=self.dropout_rate,
+        name="depthwise_conv_mnas_"+self.prefix,
         use_bias=False)
 
     else:
@@ -197,6 +202,7 @@ class MBConvBlock(object):
         axis=self._channel_axis,
         momentum=self._batch_norm_momentum,
         epsilon=self._batch_norm_epsilon,
+        name = "bn1_" + self.prefix,
         fused=True)
 
     if self.has_se:
@@ -211,6 +217,7 @@ class MBConvBlock(object):
           strides=[1, 1],
           kernel_initializer=conv_kernel_initializer,
           padding='same',
+          name = "se_reduce_" + self.prefix,
           use_bias=True)
       self._se_expand = tf.keras.layers.Conv2D(
           filters,
@@ -218,6 +225,7 @@ class MBConvBlock(object):
           strides=[1, 1],
           kernel_initializer=conv_kernel_initializer,
           padding='same',
+          name = "se_expand_" + self.prefix,
           use_bias=True)
 
     # Output phase:
@@ -228,11 +236,13 @@ class MBConvBlock(object):
         strides=[1, 1],
         kernel_initializer=conv_kernel_initializer,
         padding='same',
+        name = "project_conv_" + self.prefix,
         use_bias=False)
     self._bn2 = tf.compat.v1.layers.BatchNormalization(
         axis=self._channel_axis,
         momentum=self._batch_norm_momentum,
         epsilon=self._batch_norm_epsilon,
+        name = "bn2_" + self.prefix,
         fused=True)
 
   def _call_se(self, input_tensor):
@@ -295,7 +305,7 @@ class SinglePathSuperNet(tf.keras.Model):
      Based on MNasNet search space: https://arxiv.org/abs/1807.11626
   """
 
-  def __init__(self, blocks_args=None, global_params=None,dropout_rate=None):
+  def __init__(self, blocks_args=None, global_params=None,dropout_rate=None, prefix=''):
     """Initializes an `SuperNet` instance.
 
     Args:
@@ -312,6 +322,7 @@ class SinglePathSuperNet(tf.keras.Model):
     self._blocks_args = blocks_args
     self.endpoints = None
     self.dropout_rate = dropout_rate
+    self.prefix = prefix
 
     self._search_space = global_params.search_space
 
@@ -342,7 +353,7 @@ class SinglePathSuperNet(tf.keras.Model):
       layer_runtimes = [self._runtime_lut[str(len(self._blocks))][str(i)] 
         for i in range(len(self._runtime_lut[str(len(self._blocks))].keys()))]
       self._blocks.append(MBConvBlock(block_args, self._global_params, 
-                                    layer_runtimes, self.dropout_rate))
+                                    layer_runtimes, self.dropout_rate, self.prefix))
 
       if block_args.num_repeat > 1:
         # pylint: disable=protected-access
@@ -356,7 +367,7 @@ class SinglePathSuperNet(tf.keras.Model):
           for i in range(len(self._runtime_lut[str(len(self._blocks))].keys()))] + \
                 [0.7] # neglibible (ms) value for skip-op (non-zero handling purposes)
         self._blocks.append(MBConvBlock(block_args, self._global_params, 
-                                      layer_runtimes, self.dropout_rate))
+                                      layer_runtimes, self.dropout_rate, self.prefix))
 
     batch_norm_momentum = self._global_params.batch_norm_momentum
     batch_norm_epsilon = self._global_params.batch_norm_epsilon
@@ -372,11 +383,13 @@ class SinglePathSuperNet(tf.keras.Model):
         strides=[2, 2],
         kernel_initializer=conv_kernel_initializer,
         padding='same',
+        name='conv_stem_'+self.prefix,
         use_bias=False)
     self._bn0 = tf.compat.v1.layers.BatchNormalization(
         axis=channel_axis,
         momentum=batch_norm_momentum,
         epsilon=batch_norm_epsilon,
+        name='conv_stem_bn_'+ self.prefix,
         fused=True)
 
     # Head part.
@@ -386,6 +399,7 @@ class SinglePathSuperNet(tf.keras.Model):
         strides=[1, 1],
         kernel_initializer=conv_kernel_initializer,
         padding='same',
+        name='conv_head_'+self.prefix,
         use_bias=False)
 
     # todo check for pixel wise ?
@@ -393,6 +407,7 @@ class SinglePathSuperNet(tf.keras.Model):
         axis=channel_axis,
         momentum=batch_norm_momentum,
         epsilon=batch_norm_epsilon,
+        name='conv_head_bn_'+self.prefix,
         fused=True)
 
     # # todo check for pixel wise
@@ -400,10 +415,11 @@ class SinglePathSuperNet(tf.keras.Model):
     #     data_format=self._global_params.data_format)
     self._fc = tf.keras.layers.Dense(
         self._global_params.num_classes,
+        name='fc_dense_'+self.prefix,
         kernel_initializer=dense_kernel_initializer)
 
     if self._global_params.dropout_rate > 0:
-      self._dropout = tf.keras.layers.Dropout(self._global_params.dropout_rate)
+      self._dropout = tf.keras.layers.Dropout(self._global_params.dropout_rate, name='dropout1_'+self.prefix)
     else:
       self._dropout = None
 
@@ -459,8 +475,19 @@ class SinglePathSuperNet(tf.keras.Model):
     #   self.endpoints['head'] = outputs
 
     # print("supernet @@@@",self.indicators)
-    #  save the indicators to a file
-    with open("indicators.pkl", 'wb+') as file:
-      pickle.dump(self.indicators, file)
 
-    return outputs, total_runtime
+    decision_labels = ['d5x5','d50c','d100c']
+    t_list = []
+    for idx in range(20): 
+      key_ = 'block_' + str(idx+1)
+      for decision_label in decision_labels:
+        v = self.indicators[key_][decision_label]
+        t_list.append(tf.reshape(v, [1]))
+    t_list_float = [float(i) for i in t_list]
+    indicators=tf.reshape(t_list_float, (20, 3))
+
+    # #  save the indicators to a file
+    # with open(self.prefix + "_indicators.pkl", 'ab+') as file:
+    #   pickle.dump(self.indicators, file)
+
+    return outputs, total_runtime, indicators

@@ -179,12 +179,14 @@ def build_supernet(images, model_name, training, prefix='', override_params=None
     global_params = global_params._replace(**override_params)
 
   with tf.compat.v1.variable_scope(model_name):
-    model = singlepath_supernet.SinglePathSuperNet(blocks_args, global_params, dropout_rate)
-    for layer in model.layers:
-          # rename all layers in the second model so there are no duplicate layer names
-          layer._name = layer.name + prefix
-    logits, total_runtime = model(images, training=training)
+    model = singlepath_supernet.SinglePathSuperNet(blocks_args, global_params, dropout_rate, prefix)
+    # for layer in model.layers:
+    #       # rename all layers in the second model so there are no duplicate layer names
+    #       layer._name = layer.name + prefix
+    #       print(layer.name)
+    # print(model.name)
+    logits, total_runtime, indicators = model(images, training=training)
     # call method enables to write classes where the instances behave like functions and can be called like a function
 
   logits = tf.identity(logits, 'logits')
-  return logits, total_runtime, model.indicators
+  return logits, total_runtime, indicators

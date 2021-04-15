@@ -35,6 +35,7 @@ class Attention:
   def __init__(self, in_shape, n_rotations, preprocess, lite=False, model_name='resnet'):
     self.n_rotations = n_rotations
     self.preprocess = preprocess
+    self.model_name = model_name
 
     max_dim = np.max(in_shape[:2])
 
@@ -67,6 +68,7 @@ class Attention:
         in0,
         model_name='single-path-search', # default option, add flags for other search space: ref @single-path-nas search_main.py
         training=is_training,
+        prefix='attention',
         # override_params=override_params, 
         dropout_rate=dropout_rate)
       # print("attention supernet shapes", in0.shape, out0.shape)
@@ -83,7 +85,7 @@ class Attention:
           kernel_initializer=CONV_KERNEL_INITIALIZER,
           name=name + 'out_conv')(y0)
       print("z0.shape",z0.shape)
-      self.model = tf.keras.models.Model(inputs=[in0], outputs=[z0])
+      self.model = tf.keras.models.Model(inputs=[in0], outputs=[z0, indicators])
 
     elif model_name == 'supernet_train_final':
     	print("Training final NAS architecture (attention) --------- ")
@@ -132,7 +134,11 @@ class Attention:
     in_tens = tf.split(in_tens, self.n_rotations)
     logits = ()
     for x in in_tens:
-      logits += (self.model(x),)
+      if self.model_name == 'supernet':
+        out_logits, indicators = self.model(x)
+        logits += (out_logits,)
+      else:
+        logits += (self.model(x),)
     logits = tf.concat(logits, axis=0)
 
     # Rotate back output.
@@ -147,13 +153,20 @@ class Attention:
     if softmax:
       output = tf.nn.softmax(output)
       output = np.float32(output).reshape(logits.shape[1:])
-    return output
+
+    if self.model_name == 'supernet':
+      return output, indicators
+    else:
+      return output
 
   def train(self, in_img, p, theta, backprop=True):
     """Train."""
     self.metric.reset_states()
     with tf.GradientTape() as tape:
-      output = self.forward(in_img, softmax=False)
+      if self.model_name == 'supernet':
+        output, indicators = self.forward(in_img, softmax=False)
+      else:
+        output = self.forward(in_img, softmax=False)
 
       # Get label.
       theta_i = theta / (2 * np.pi / self.n_rotations)
@@ -174,7 +187,10 @@ class Attention:
       self.optim.apply_gradients(zip(grad, self.model.trainable_variables))
       self.metric(loss)
 
-    return np.float32(loss)
+    if self.model_name == 'supernet':
+      return np.float32(loss), indicators
+    else:
+      return np.float32(loss)
 
   def load(self, path):
     self.model.load_weights(path)

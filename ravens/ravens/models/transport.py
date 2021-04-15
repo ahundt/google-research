@@ -88,10 +88,11 @@ class Transport:
       dropout_rate = 0.2
       is_training = True # TODO check if its true or false
       in0 = tf.keras.layers.Input(shape=in_shape)
-      out0, runtime_val, indicators = build_supernet(
+      out0, _, indicators = build_supernet(
         in0,
         model_name='single-path-search', # default option, add flags for other search space: ref @single-path-nas search_main.py
         training=is_training,
+        prefix='transport',
         # override_params=override_params, 
         dropout_rate=dropout_rate)
       print("xx-1",out0.shape)
@@ -124,7 +125,7 @@ class Transport:
       x0 = tf.keras.layers.Cropping2D(cropping=(32,32))(x0)
       print("x0.shape",x0.shape)
 
-      self.model = tf.keras.Model(inputs=[in0], outputs=[x0])
+      self.model = tf.keras.Model(inputs=[in0], outputs=[x0,indicators])
 
     elif model_name == 'supernet_train_final':
       print("Training final NAS architecture")
@@ -336,17 +337,21 @@ class Transport:
     if self.model_name == 'efficientnet_merged':
       logits, crop = self.model([in_tensor])
     elif self.model_name == 'supernet':
-      logits = self.model([in_tensor])
-      return logits
+      logits, indicators = self.model([in_tensor])
+      return logits, indicators
     else:
       logits, crop = self.model([in_tensor, in_tensor])
     print("forward:logits.shape",logits.shape)
     # crop = tf.identity(kernel_bef_crop)
     crop = tf.repeat(crop, repeats=self.n_rotations, axis=0)
     crop = tfa.image.transform(crop, rvecs, interpolation='NEAREST')
-    crop = crop[:, p[0]:(p[0] + self.crop_size),
-                p[1]:(p[1] + self.crop_size), :]
-    logits, kernel_raw = self.model([in_tensor, crop])
+
+    kernel_raw = crop[:, p[0]:(p[0] + self.crop_size),
+    						p[1]:(p[1] + self.crop_size), :]
+
+    # crop = crop[:, p[0]:(p[0] + self.crop_size),
+    #             p[1]:(p[1] + self.crop_size), :]
+    # logits, kernel_raw = self.model([in_tensor, crop])
 
     # Crop after network (for receptive field, and more elegant).
     # logits, crop = self.model([in_tensor, in_tensor])
@@ -380,7 +385,10 @@ class Transport:
     self.metric.reset_states()
     with tf.GradientTape() as tape:
       print("in_img.shape",in_img.shape)
-      output = self.forward(in_img, p, softmax=False)
+      if self.model_name == 'supernet':
+      	output, indicators = self.forward(in_img, p, softmax=False)
+      else:
+      	output = self.forward(in_img, p, softmax=False)
 
       itheta = theta / (2 * np.pi / self.n_rotations)
       itheta = np.int32(np.round(itheta)) % self.n_rotations
@@ -405,7 +413,10 @@ class Transport:
         self.metric(loss)
 
     self.iters += 1
-    return np.float32(loss)
+    if self.model_name == 'supernet':
+    	return np.float32(loss), indicators
+    else:
+    	return np.float32(loss)
 
   def get_se2(self, n_rotations, pivot):
     """Get SE2 rotations discretized into n_rotations angles counter-clockwise."""
