@@ -18,3 +18,11 @@ dist/
 
 # Other
 *.DS_Store
+
+ravens/ravens/assets
+
+ravens/logs/
+
+ravens/checkpoints/
+
+ravens/data
